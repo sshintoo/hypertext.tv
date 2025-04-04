@@ -8,8 +8,12 @@
       <span>↑↓Select</span><span>Adjust←→</span>
     </div>
     <hr />
-    <button role="menuitem" tabindex="0" type="button" data-on="true"
-      >Scanlines</button
+    <button
+      role="menuitem"
+      tabindex="0"
+      type="button"
+      data-on="true"
+      data-setting="scanlines">Scanlines</button
     >
     <label role="menuitem" tabindex="-1">
       <span>Brightness</span>
@@ -58,6 +62,8 @@
       localStorageKey: string;
       defaultValue: string;
       eventName: string;
+      eventProperty: string;
+      type: "slider" | "toggle";
     }[];
 
     constructor(selector: string) {
@@ -67,62 +73,77 @@
 
       this.settings = [
         {
+          name: "scanlines",
+          localStorageKey: "scanlines",
+          defaultValue: "true",
+          eventName: "scanlineToggle",
+          eventProperty: "enabled",
+          type: "toggle",
+        },
+        {
           name: "brightness",
           localStorageKey: "brightness",
           defaultValue: "0",
           eventName: "brightnessChange",
+          eventProperty: "brightness",
+          type: "slider",
         },
         {
           name: "color",
           localStorageKey: "color",
           defaultValue: "0",
           eventName: "colorChange",
+          eventProperty: "color",
+          type: "slider",
         },
         {
           name: "tint",
           localStorageKey: "tint",
           defaultValue: "0",
           eventName: "tintChange",
+          eventProperty: "tint",
+          type: "slider",
         },
         {
           name: "horizontal",
           localStorageKey: "horizontal",
           defaultValue: "0",
           eventName: "horizontalChange",
+          eventProperty: "horizontal",
+          type: "slider",
         },
         {
           name: "vertical",
           localStorageKey: "vertical",
           defaultValue: "0",
           eventName: "verticalChange",
+          eventProperty: "vertical",
+          type: "slider",
         },
       ];
 
       this.el.addEventListener("keydown", this.handleKeyDown.bind(this));
 
+      // Set up event listeners for all items
       this.items.forEach((item) => {
         item.addEventListener("click", this.handleClick.bind(this));
 
+        // Set up input listeners for all sliders
         this.settings.forEach((setting) => {
-          const input = item.querySelector(`input[name='${setting.name}']`);
-          if (input) {
-            input.addEventListener("input", (e: Event) => {
-              const inputElement = e.target as HTMLInputElement;
-              this.handleSliderChange(setting.name, inputElement.value);
-            });
+          if (setting.type === "slider") {
+            const input = item.querySelector(`input[name='${setting.name}']`);
+            if (input) {
+              input.addEventListener("input", (e: Event) => {
+                const inputElement = e.target as HTMLInputElement;
+                this.handleSettingChange(setting.name, inputElement.value);
+              });
+            }
           }
         });
       });
 
+      // Initialize all settings
       this.initializeSettings();
-
-      const scanlineButton = this.items.find(
-        (item) => item.textContent?.trim() === "Scanlines",
-      );
-      if (scanlineButton) {
-        const savedState = localStorage.getItem("scanlines") === "true";
-        scanlineButton.setAttribute("data-on", savedState ? "true" : "false");
-      }
     }
 
     // Public method to set the selected index and update focus
@@ -135,17 +156,32 @@
 
     private initializeSettings(): void {
       this.settings.forEach((setting) => {
-        const input = this.el.querySelector(
-          `input[name='${setting.name}']`,
-        ) as HTMLInputElement;
+        if (setting.type === "slider") {
+          // Initialize slider settings
+          const input = this.el.querySelector(
+            `input[name='${setting.name}']`,
+          ) as HTMLInputElement;
 
-        if (input) {
-          const savedValue =
-            localStorage.getItem(setting.localStorageKey) ||
-            setting.defaultValue;
-          input.value = savedValue;
-
-          this.handleSliderChange(setting.name, savedValue);
+          if (input) {
+            const savedValue =
+              localStorage.getItem(setting.localStorageKey) ||
+              setting.defaultValue;
+            input.value = savedValue;
+            this.handleSettingChange(setting.name, savedValue);
+          }
+        } else if (setting.type === "toggle") {
+          // Initialize toggle settings
+          const toggleElement = this.el.querySelector(
+            `[data-setting="${setting.name}"]`,
+          );
+          if (toggleElement) {
+            const savedState =
+              localStorage.getItem(setting.localStorageKey) === "true";
+            toggleElement.setAttribute(
+              "data-on",
+              savedState ? "true" : "false",
+            );
+          }
         }
       });
     }
@@ -156,30 +192,22 @@
         const newState = !isOn;
         item.setAttribute("data-on", newState ? "true" : "false");
 
-        // Handle scanlines toggle
-        if (item.textContent?.trim() === "Scanlines") {
-          this.handleScanlineToggle(newState);
+        // Check if this is a toggleable setting
+        const settingName = item.getAttribute("data-setting");
+        if (settingName) {
+          this.handleSettingChange(settingName, newState.toString());
         }
       }
     }
 
-    private handleScanlineToggle(isOn: boolean) {
-      localStorage.setItem("scanlines", isOn.toString());
-      const event = new CustomEvent("scanlineToggle", {
-        detail: { enabled: isOn },
-        bubbles: true,
-      });
-      this.el.dispatchEvent(event);
-    }
-
-    private handleSliderChange(sliderType: string, value: string) {
-      const setting = this.settings.find((s) => s.name === sliderType);
+    private handleSettingChange(settingName: string, value: string) {
+      const setting = this.settings.find((s) => s.name === settingName);
       if (!setting) return;
 
       localStorage.setItem(setting.localStorageKey, value);
 
       const event = new CustomEvent(setting.eventName, {
-        detail: { [setting.localStorageKey]: value },
+        detail: { [setting.eventProperty]: value },
         bubbles: true,
       });
       this.el.dispatchEvent(event);
@@ -216,7 +244,7 @@
               parseFloat(input.value) - 1,
             );
             input.value = newValue.toString();
-            this.handleSliderChange(input.name, input.value);
+            this.handleSettingChange(input.name, input.value);
           } else {
             this.toggleItem(currentItem);
           }
@@ -230,7 +258,7 @@
               parseFloat(input.value) + 1,
             );
             input.value = newValue.toString();
-            this.handleSliderChange(input.name, input.value);
+            this.handleSettingChange(input.name, input.value);
           } else {
             this.toggleItem(currentItem);
           }
@@ -306,17 +334,12 @@
     }
   }
 
-  // Create a global reference to the MenuFocusGroup instance
   let menuFocusGroup: MenuFocusGroup;
 
   function openMenu() {
     const menu = document.querySelector(".menu");
     menu?.setAttribute("data-open", "true");
-
-    // Reset the selected index to 0 when opening the menu
-    if (menuFocusGroup) {
-      menuFocusGroup.setSelectedIndex(0);
-    }
+    if (menuFocusGroup) menuFocusGroup.setSelectedIndex(0);
   }
 
   function closeMenu() {
@@ -334,8 +357,6 @@
 
   const menu = document.querySelector(".menu");
   menu?.setAttribute("data-open", "false");
-
-  // Store the MenuFocusGroup instance in the global variable
   menuFocusGroup = new MenuFocusGroup(".menu-content");
 
   const menuButton = document.getElementById("menu");
@@ -346,9 +367,7 @@
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      closeMenu();
-    }
+    if (event.key === "Escape") closeMenu();
   });
 </script>
 
