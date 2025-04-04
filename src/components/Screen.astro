@@ -37,8 +37,8 @@ const { channelId, channelName }: Props = Astro.props;
   // Initialize scanlines state from localStorage
   const scanlines = document.querySelector(".scanlines");
   if (scanlines) {
-    const savedState = localStorage.getItem("scanlines") === "true";
-    scanlines.setAttribute("data-active", savedState ? "true" : "false");
+    const savedState = localStorage.getItem("scanlines");
+    scanlines.setAttribute("data-active", savedState ?? "true");
   }
 
   // Listen for brightness change events
