@@ -1,0 +1,126 @@
+<div id="rainbow"></div>
+
+<script>
+  import * as THREE from "three";
+  import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+  import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+  import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+  import vertexShader from "../../../shaders/rainbow.vert?raw";
+  import fragmentShader from "../../../shaders/rainbow.frag?raw";
+
+  const canvas = document.getElementById("rainbow");
+
+  if (canvas) {
+    // ----------------------
+    // Three.js setup
+    // ----------------------
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(
+      100,
+      canvas.clientWidth / canvas.clientHeight,
+      0.1,
+      5000,
+    );
+    camera.position.z = 300;
+    camera.zoom = 2;
+    camera.updateProjectionMatrix();
+
+    const renderer = new THREE.WebGLRenderer({
+      powerPreference: "low-power",
+      alpha: true,
+      antialias: false,
+      preserveDrawingBuffer: true,
+    });
+    renderer.setAnimationLoop(animate);
+    canvas.appendChild(renderer.domElement);
+
+    const composer = new EffectComposer(renderer);
+
+    const resize = () => {
+      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      composer.setSize(canvas.clientWidth, canvas.clientHeight);
+      composer.setPixelRatio(window.devicePixelRatio);
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    // ----------------------
+    // Animated Mesh BG
+    // ----------------------
+
+    const background = new THREE.Object3D();
+    scene.add(background);
+
+    // Create shader material for wavy background
+    const backgroundMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uSpeed: { value: 0.1 },
+        uNoiseFreq: { value: 2.0 },
+        uMouse: { value: new THREE.Vector2(0, 0) },
+      },
+      vertexShader,
+      fragmentShader,
+      side: THREE.DoubleSide,
+    });
+
+    const backgroundMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(1600, 600, 128, 128),
+      backgroundMaterial,
+    );
+
+    // Update rotation for more dramatic angle
+    backgroundMesh.rotation.set(-Math.PI * 0.05, 0, 0); // More tilted back and rotated
+    backgroundMesh.position.set(0, 20, -100); // Move it down and back slightly
+    background.add(backgroundMesh);
+
+    // Add mouse position tracking
+    const mouse = {
+      x: 0,
+      y: 0,
+      targetX: 0,
+      targetY: 0,
+    };
+
+    // Update mouse position on move
+    window.addEventListener("mousemove", (event) => {
+      // Convert mouse position to normalized device coordinates (-1 to +1)
+      mouse.targetX = (event.clientX / canvas.clientWidth) * 2 - 1;
+      mouse.targetY = -(event.clientY / canvas.clientHeight) * 2 + 1;
+    });
+
+    // ----------------------
+    // Postprocessing
+    // ----------------------
+
+    const renderPass = new RenderPass(scene, camera);
+    const outputPass = new OutputPass();
+
+    composer.addPass(renderPass);
+    composer.addPass(outputPass);
+
+    function animate() {
+      backgroundMaterial.uniforms.uTime.value = performance.now() * 0.0003;
+      // Update mouse position in shader
+      backgroundMaterial.uniforms.uMouse.value.set(mouse.x, mouse.y);
+
+      // Smooth interpolation of cursor position
+      mouse.x += (mouse.targetX - mouse.x) * 0.1;
+      mouse.y += (mouse.targetY - mouse.y) * 0.1;
+
+      composer.render();
+    }
+  }
+</script>
+
+<style>
+  #rainbow {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+</style>

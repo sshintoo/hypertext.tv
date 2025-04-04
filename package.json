@@ -1,14 +1,35 @@
 {
-  "name": "webring-tv",
+  "name": "hypertext-tv",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "prepare": "husky",
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "format": "biome format",
+    "format:fix": "biome format --write .",
+    "lint": "biome lint",
+    "lint:fix": "biome lint --write .",
+    "check": "astro check && biome check",
+    "check:fix": "astro check && biome check --write ."
   },
   "dependencies": {
-    "astro": "^5.5.2"
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/mdx": "^4.2.2",
+    "@astrojs/netlify": "^6.2.3",
+    "astro": "^5.5.2",
+    "three": "^0.174.0",
+    "typescript": "^5.8.2"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@types/three": "^0.174.0",
+    "autoprefixer": "^10.4.21",
+    "cssnano": "^7.0.6",
+    "husky": "^9.1.7",
+    "sharp": "^0.34.0"
   }
 }

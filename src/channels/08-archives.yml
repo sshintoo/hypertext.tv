@@ -1,0 +1,22 @@
+slug: "08"
+name: Archives
+schedule:
+  monday:
+  tuesday:
+  wednesday:
+  thursday:
+  friday:
+    - "14:00":
+        title: Hardware Archive
+        author: Liang-Jung Chen
+        url: https://hardwarearchive.org/
+  saturday:
+    - "00:00":
+        title: Sky
+        author: Nazlı Ercan 
+        url: https://nazli-ercan.com/sky/
+    - "13:30": null
+    - "14:30":
+        title: The HTML Review
+        url: https://thehtml.review/
+  sunday:

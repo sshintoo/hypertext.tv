@@ -1,0 +1,109 @@
+---
+import Television from "src/components/Television.astro";
+import Layout from "src/layouts/Layout.astro";
+---
+
+<Layout>
+  <Television
+    activeProgram={{
+      program: {
+        title: "404 Err Not Found",
+      },
+    }}
+    channelId="404"
+    channelName="Not Found"
+  >
+    <div class="marquee">
+      <svg
+        id="dvd"
+        viewBox="0 0 142 65"
+        fill="white"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M118.735 42.6L120.442 34.56H96.0723L97.7797 26.76L125.021 0.719971H138.913L133.093 27.66H140L138.525 34.56H131.618L129.911 42.6H118.735ZM107.326 27.66H121.917L125.564 10.8H124.943L107.326 27.66Z"
+        ></path>
+        <path
+          d="M70.6461 43.32C64.1785 43.32 59.4184 41.9 56.3657 39.06C53.3647 36.18 51.8643 32.24 51.8643 27.24C51.8643 23.8 52.3041 20.44 53.1836 17.16C54.115 13.88 55.5637 10.98 57.5298 8.46C59.496 5.9 62.0054 3.86 65.0581 2.34C68.1625 0.780001 71.8878 0 76.234 0C79.4937 0 82.2877 0.38 84.616 1.14C86.9961 1.86 88.9622 2.92 90.5144 4.32C92.0666 5.68 93.2049 7.36 93.9293 9.36C94.6536 11.32 95.0158 13.56 95.0158 16.08C95.0158 19.52 94.5502 22.88 93.6188 26.16C92.7393 29.44 91.3164 32.36 89.3502 34.92C87.3841 37.44 84.8488 39.48 81.7444 41.04C78.6917 42.56 74.9923 43.32 70.6461 43.32ZM70.6461 36.42C72.4052 36.42 73.8798 36.18 75.0699 35.7C76.3116 35.22 77.3465 34.52 78.1743 33.6C79.0539 32.68 79.7524 31.56 80.2698 30.24C80.7872 28.92 81.227 27.4 81.5892 25.68L83.219 18.06C83.426 17.14 83.5553 16.34 83.6071 15.66C83.7105 14.98 83.7623 14.3 83.7623 13.62C83.7623 11.5 83.1414 9.86 81.8996 8.7C80.7096 7.5 78.8211 6.9 76.234 6.9C74.4749 6.9 72.9744 7.14 71.7326 7.62C70.5426 8.1 69.5078 8.8 68.6282 9.72C67.8003 10.64 67.1277 11.76 66.6103 13.08C66.0929 14.4 65.6531 15.92 65.2909 17.64L63.6611 25.26C63.4541 26.18 63.2989 26.98 63.1954 27.66C63.1437 28.34 63.1178 29.02 63.1178 29.7C63.1178 31.82 63.7128 33.48 64.9029 34.68C66.1446 35.84 68.059 36.42 70.6461 36.42ZM72.8968 25.2C71.2928 25.2 70.1287 24.96 69.4043 24.48C68.7317 24 68.3953 23.4 68.3953 22.68C68.3953 22.28 68.473 21.72 68.6282 21C68.8351 20.08 69.3525 19.38 70.1804 18.9C71.0082 18.38 72.2759 18.12 73.9833 18.12C75.5873 18.12 76.7256 18.36 77.3982 18.84C78.1226 19.32 78.4847 19.92 78.4847 20.64C78.4847 21.04 78.4071 21.6 78.2519 22.32C78.0449 23.24 77.5275 23.96 76.6997 24.48C75.8718 24.96 74.6042 25.2 72.8968 25.2Z"
+        ></path>
+        <path
+          d="M25.6623 42.6L27.3698 34.56H3L4.70744 26.76L31.9488 0.719971H45.8411L40.0203 27.66H46.9277L45.4531 34.56H38.5457L36.8383 42.6H25.6623ZM14.2536 27.66H28.8444L32.4921 10.8H31.8712L14.2536 27.66Z"
+        ></path>
+        <path
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M71 65C110.212 65 142 60.5228 142 55C142 49.4772 110.212 45 71 45C31.7878 45 0 49.4772 0 55C0 60.5228 31.7878 65 71 65ZM71 52C79.8366 52 87 53.3431 87 55C87 56.6569 79.8366 58 71 58C62.1634 58 55 56.6569 55 55C55 53.3431 62.1634 52 71 52Z"
+        ></path>
+      </svg>
+    </div>
+  </Television>
+</Layout>
+
+<script is:inline>
+  let x = 0,
+    y = 0,
+    dirX = 1,
+    dirY = 1;
+  const speed = 1.5;
+  const pallete = ["#ff8800", "#e124ff", "#6a19ff", "#ff2188"];
+
+  let dvd = document.getElementById("dvd");
+  if (!dvd) return;
+
+  dvd.style.fill = pallete[0];
+  let prevColorChoiceIndex = 0;
+
+  const dvdWidth = dvd.clientWidth;
+  const dvdHeight = dvd.clientHeight;
+
+  function getNewRandomColor() {
+    const currentPallete = [...pallete];
+    currentPallete.splice(prevColorChoiceIndex, 1);
+    const colorChoiceIndex = Math.floor(Math.random() * currentPallete.length);
+    prevColorChoiceIndex =
+      colorChoiceIndex < prevColorChoiceIndex
+        ? colorChoiceIndex
+        : colorChoiceIndex + 1;
+    const colorChoice = currentPallete[colorChoiceIndex];
+    return colorChoice;
+  }
+
+  function animate() {
+    const marquee = document.querySelector(".marquee");
+    if (!marquee || !dvd) return;
+    const screenHeight = marquee.clientHeight;
+    const screenWidth = marquee.clientWidth;
+
+    if (y + dvdHeight >= screenHeight || y < 0) {
+      dirY *= -1;
+      dvd.style.fill = getNewRandomColor();
+    }
+    if (x + dvdWidth >= screenWidth || x < 0) {
+      dirX *= -1;
+      dvd.style.fill = getNewRandomColor();
+    }
+    x += dirX * speed;
+    y += dirY * speed;
+    dvd.style.left = x + "px";
+    dvd.style.top = y + "px";
+    window.requestAnimationFrame(animate);
+  }
+
+  window.requestAnimationFrame(animate);
+</script>
+
+<style>
+  .marquee {
+    background: black;
+    width: 100%;
+    height: 100%;
+    filter: blur(0.5px);
+  }
+
+  #dvd {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 18vw;
+  }
+</style>

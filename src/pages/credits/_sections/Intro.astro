@@ -1,0 +1,53 @@
+---
+import { Image } from "astro:assets";
+import logo from "../_images/logo.svg";
+---
+
+<section class="logo">
+  <h1><Image src={logo} alt="Hypertext TV" height={120} /></h1>
+</section>
+<section class="intro">
+  <p>
+    Music! Art! Games! Poetry! Dreams beyond the walled gardens! New programs
+    daily! A celebration of the handmade web! A patchwork quilt of hypertext!
+    Nothing on-demand! Nothing algorithmic! Enjoy the moment!
+  </p>
+  <p>
+    Created by <a href="https://eva.town">Eva Decker</a><br />March 2025<br />
+    <a href="https://sfpc.study">School for Poetic Computation</a><br />"The
+    Browser is Already A Game Engine"<br />with <a
+      href="https://everest-pipkin.com/">Everest Pipkin</a
+    >
+  </p>
+</section>
+
+<script></script>
+
+<style>
+  .logo {
+    display: flex;
+    justify-content: center;
+    padding-block: 80vh 20vh;
+  }
+
+  .intro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  h1 {
+    margin-bottom: 4rem;
+  }
+
+  p {
+    max-width: 40ch;
+  }
+
+  p + p {
+    margin-top: 4rem;
+  }
+</style>

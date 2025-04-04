@@ -1,0 +1,52 @@
+slug: "06"
+name: Single-Use
+schedule:
+  monday:
+    - "00:00":
+        title: The Death Generator
+        url: https://deathgenerator.com/#gallery
+    - "20:00":
+        title: How did you find me?
+        url: https://www.howdidyoufind.me/
+  tuesday:
+    - "00:00":
+        title: Magnetic Type Maker
+        url: https://editor.p5js.org/selina_wkh/full/tbADcQcs3
+    - "13:00":
+        title: Designercize
+        url: https://designercize.com/
+    - "14:00":
+        title: Vertigo
+        url: https://muffinman.io/vertigo/
+  wednesday:
+    - "13:00":
+        title: TypeCooker
+        url: https://typecooker.com/
+    - "14:00":
+        title: Intensifying Emoji Generator
+        url: https://tholman.com/emoji-intensifies/
+  thursday:
+    - "13:00":
+        title: Every screen resolution
+        url: http://lascarid.es/screenres.html
+    - "15:00":
+        title: Is It Toxic To?
+        author: Chester How
+        url: https://iitt.chester.how/
+  friday:
+    - "15:00":
+        title: ON/OFF
+        author: Marco Land
+        url: https://onoff.marco.land/
+  saturday:
+    - "11:30": null
+    - "12:30":
+        title: Po.ta.to
+        url: https://po.ta.to/
+    - "13:00":
+        title: wide emoji maker
+        url: https://emoji-stretcher--maxbittker.on.websim.ai/
+    - "14:30":
+        title: Mouse Pointer
+        url: https://mousepointer.name/
+  sunday:

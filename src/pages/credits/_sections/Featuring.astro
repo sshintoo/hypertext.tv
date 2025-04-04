@@ -1,0 +1,31 @@
+---
+import { getAllContributors } from "@utils/getAllContributors";
+
+const allContributors = await getAllContributors();
+---
+
+<section>
+  <h2>Featuring</h2>
+  <div class="featuring">
+    {allContributors.map((contributor) => <span>{contributor}</span>)}
+    <a
+      href="https://github.com/evadecker/hypertext.tv"
+      target="_blank"
+      rel="noopener noreferrer">&hellip;and you?</a
+    >
+  </div>
+</section>
+
+<style>
+  .featuring {
+    text-align: center;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(16ch, 1fr));
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    line-height: 1;
+    text-wrap: nowrap;
+  }
+</style>

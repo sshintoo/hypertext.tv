@@ -1,0 +1,51 @@
+---
+import { Image } from "astro:assets";
+import betterVcr from "../_images/better-vcr.svg";
+import dseg14 from "../_images/dseg-14.svg";
+import eurostileExtd from "../_images/eurostile-extd.svg";
+import eurostile from "../_images/eurostile.svg";
+---
+
+<section>
+  <h2>Fonts</h2>
+  <div class="fonts">
+    <a
+      href="https://www.dafont.com/better-vcr.font"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <Image src={betterVcr} alt="Better VCR" />
+    </a>
+    <a
+      href="https://github.com/ZeusOfTheCrows/DSegstended"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <Image src={dseg14} alt="DSEG 14" />
+    </a>
+    <a
+      href="https://fonts.adobe.com/fonts/eurostile"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <Image src={eurostile} alt="Eurostile" />
+    </a>
+    <a
+      href="https://fonts.adobe.com/fonts/eurostile-extended"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      <Image src={eurostileExtd} alt="Eurostile Extd" />
+    </a>
+  </div>
+</section>
+
+<style>
+  .fonts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3ch;
+    justify-content: center;
+    align-items: center;
+  }
+</style>

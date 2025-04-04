@@ -1,0 +1,59 @@
+---
+export const prerender = false;
+
+import { getEntry } from "astro:content";
+import NoSchedule from "@components/NoSchedule.astro";
+import Television from "@components/Television.astro";
+import Layout from "@layouts/Layout.astro";
+import { findActiveProgram } from "@utils/findActiveProgram";
+const { id } = Astro.params;
+
+if (!id) return Astro.redirect("/404");
+
+const channel = await getEntry("channels", id);
+if (!channel) return Astro.redirect("/404");
+const { name } = channel.data;
+
+const activeProgram = findActiveProgram(channel.data.schedule, new Date());
+---
+
+<Layout>
+  <Television activeProgram={activeProgram} channelId={id} channelName={name}>
+    {
+      activeProgram?.program ? (
+        <iframe
+          src={activeProgram.program.url}
+          class="iframe"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen
+        />
+      ) : (
+        <NoSchedule />
+      )
+    }
+  </Television>
+</Layout>
+
+<script>
+  const iframe = document.querySelector(".iframe");
+
+  if (iframe) {
+    iframe.addEventListener("load", () => {
+      iframe.classList.add("loaded");
+    });
+  }
+</script>
+
+<style>
+  .iframe {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: none;
+
+    &.loaded {
+      background-color: white;
+    }
+  }
+</style>

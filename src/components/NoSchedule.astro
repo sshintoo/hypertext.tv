@@ -1,0 +1,108 @@
+---
+
+---
+
+<div class="no-schedule">
+  <div class="message">No scheduled program</div>
+  <svg
+    viewBox="0 0 672 504"
+    preserveAspectRatio="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M0 0H96V336H0V0Z" fill="#FFFFFF"></path>
+    <path d="M96 0H192V336H96V0Z" fill="#FFFF00"></path>
+    <path d="M192 0H288V336H192V0Z" fill="#00FFFF"></path>
+    <path d="M288 0H384V336H288V0Z" fill="#00FF00"></path>
+    <path d="M384 0H480V336H384V0Z" fill="#FF00FF"></path>
+    <path d="M480 0H576V336H480V0Z" fill="#FF0000"></path>
+    <path d="M576 0H672V336H576V0Z" fill="#0000FF"></path>
+    <path d="M192 336H288V378H192V336Z" fill="#FF00FF"></path>
+    <path d="M96 336H0V378H96V336Z" fill="#0000FF"></path>
+    <path d="M192 336H96V378H192V336Z" fill="#131313"></path>
+    <path d="M384 336H288V378H384V336Z" fill="#131313"></path>
+    <path d="M576 336H480V378H576V336Z" fill="#131313"></path>
+    <path d="M672 378H576V504H672V378Z" fill="#131313"></path>
+    <path d="M544 378H512V504H544V378Z" fill="#131313"></path>
+    <path d="M480 378H360V504H480V378Z" fill="#131313"></path>
+    <path d="M384 336H480V378H384V336Z" fill="#00FFFF"></path>
+    <path d="M576 336H672V378H576V336Z" fill="#FFFFFF"></path>
+    <path d="M0 378H120V504H0V378Z" fill="#000080"></path>
+    <path d="M120 378H240V504H120V378Z" fill="#C0C0C0"></path>
+    <path d="M240 378H360V504H240V378Z" fill="#4B0082"></path>
+    <path d="M480 378H512V504H480V378Z" fill="#000000"></path>
+    <path d="M544 378H576V504H544V378Z" fill="#1D1D1D"></path>
+  </svg>
+</div>
+
+<script>
+  const paths = document.querySelectorAll(".no-schedule svg path");
+
+  let colors = ["#FF0000", "#00FFFF", "#00FF00", "#FF00FF", "#0000FF"];
+
+  Array.from(paths).map((path) => {
+    const color = path.getAttribute("fill");
+    if (color && !colors.includes(color)) colors.push(color);
+  });
+
+  const getRandomColor = (currentColor: string) => {
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    if (randomColor === currentColor) return getRandomColor(currentColor);
+    return randomColor;
+  };
+
+  paths.forEach((path) => {
+    path.addEventListener("click", () => {
+      path.setAttribute(
+        "fill",
+        getRandomColor(path.getAttribute("fill") ?? ""),
+      );
+    });
+  });
+
+  const getNextLetter = (currentLetter: string) => {
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ.!?-:() ";
+    const index = letters.indexOf(currentLetter.toUpperCase());
+    return letters[index + 1] ?? letters[0];
+  };
+
+  const text = document.querySelector(".no-schedule .message")?.textContent;
+  const text_wrapped = text?.replace(/./g, "<span>$&</span>");
+
+  const message = document.querySelector(".no-schedule .message") as Element;
+  if (message) {
+    message.innerHTML = text_wrapped as string;
+  }
+
+  const spans = document.querySelectorAll(".no-schedule .message span");
+
+  spans.forEach((span) => {
+    span.addEventListener("click", () => {
+      span.textContent = getNextLetter(span.textContent ?? "");
+    });
+  });
+</script>
+
+<style>
+  .no-schedule {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .message {
+      position: absolute;
+      background-color: black;
+      color: white;
+      font-family: "Better VCR", monospace;
+      font-size: 4vw;
+      text-transform: uppercase;
+      user-select: none;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+  }
+</style>

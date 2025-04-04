@@ -1,0 +1,77 @@
+slug: "05"
+name: Poetry
+schedule:
+  monday:
+  tuesday:
+    - "00:00":
+        title: Whispers from a Soft Garden
+        author: Esther Bouquet
+        url: https://thehtml.review/02/whispers-from-a-soft-garden
+    - "00:30":
+        title: Beach
+        url: https://lrsphm.github.io/poem-club/beach.html
+    - "01:00":
+        title: Joy
+        url: https://lrsphm.github.io/poem-club/joy.html
+    - "01:30":
+        title: Hidden Folder
+        url: https://lrsphm.github.io/poem-club/hiddenfolder.html
+    - "02:00":
+        title: The thing you didn't choose
+        url: https://lrsphm.github.io/poem-club/didnt-choose.html
+    - "02:30":
+        title: a butterfly goes
+        url: https://lrsphm.github.io/poem-club/butterfly.html
+    - "03:00":
+        title: pure love
+        url: https://lrsphm.github.io/poem-club/pure-love.html
+    - "03:30":
+        title: Poem Club
+        author: Larissa Pham
+        url: https://lrsphm.github.io/poem-club/
+    - "04:00":
+        title: "[ fail ]"
+        url: https://ezn.leverburns.blue/
+    - "04:30":
+        title: a website could be
+        url: https://the-personalized-web.digitale-grafik.com/polina/
+    - "13:00":
+        title: Dust (Gravity)
+        url: https://tdingsun.github.io/dust/
+    - "13:30":
+        title: Glossary
+        author: Tiger Dingsun
+        url: https://tdingsun.github.io/glossary/
+    - "14:00":
+        title: To See The Wave As A Sliding Door
+        url: https://toseethewaveasaslidingdoor.com/
+  wednesday:
+    - "00:00":
+        title: Design Is
+        author: Eva Decker
+        url: https://design.eva.town
+  thursday:
+    - "00:00":
+        title: soft corruptor
+        author: Everest Pipkin
+        url: https://ifyoulived.org/fragment/soft/poem
+  friday:
+    - "00:00":
+        title: i feel so much shame
+        url: https://ifeelsomuchshame.me/
+  saturday:
+    - "01:00":
+        title: found poem
+        author: Alicia Guo
+        url: https://thehtml.review/02/found-poem/
+    - "03:00":
+        title: Spoilia
+        author:
+          - Blair Johnson
+          - Luke Williams
+        url: https://blairjohnsonpoetry.com/spoilia/
+  sunday:
+    - "21:00":
+        title: Institute of Fourth Dimensional Thinking
+        author: Scott Jon Siegel
+        url: https://thinkfourth.org/

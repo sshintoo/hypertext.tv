@@ -1,0 +1,92 @@
+slug: "07"
+name: Explorables
+schedule:
+  monday:
+  tuesday:
+    - "01:00":
+        title: Why do astronauts float?
+        author: Andy Hall
+        url: https://testtubegames.com/weightless.html
+    - "13:30":
+        title: Wine and Math
+        author: Lars Verspohl
+        url: https://pudding.cool/2021/03/wine-model/
+    - "16:00":
+        title: Emoji Simulator
+        author: Nicky Case
+        url: https://ncase.me/sim/
+  wednesday:
+    - "00:00":
+        title: Dumpling Love
+        url: https://dumpling.love/
+    - "12:00":
+        title: Attractor Landscapes
+        author: Nicky Case
+        url: https://ncase.me/attractors/
+    - "14:00":
+        title: The Wisdom And/Or Madness Of Crowds
+        author: Nicky Case
+        url: https://ncase.me/crowds/
+    - "16:00":
+        title: Defense Against Dishonest Charts
+        author: Nathan Yau
+        url: https://flowingdata.com/projects/dishonest-charts/
+  thursday:
+    - "00:00":
+        title: Andy's Brain
+        author: Andrew Looney
+        url: https://www.wunderland.com/WTS/Andy/BrainNodes/ABrainMap.html
+    - "14:00":
+        title: To Build A Better Ballot
+        author: Nicky Case
+        url: https://ncase.me/ballot/
+    - "16:00":
+        title: Bicycle
+        author: Bartosz Ciechanowski
+        url: https://ciechanow.ski/bicycle/
+    - "16:30":
+        title: Airfoil
+        author: Bartosz Ciechanowski
+        url: https://ciechanow.ski/airfoil/
+    - "17:00":
+        title: Moon
+        author: Bartosz Ciechanowski
+        url: https://ciechanow.ski/moon/
+    - "17:30":
+        title: Sound
+        author: Bartosz Ciechanowski
+        url: https://ciechanow.ski/sound/
+    - "18:00":
+        title: Mechanical Watch
+        author: Bartosz Ciechanowski
+        url: https://ciechanow.ski/mechanical-watch/
+    - "18:30":
+        title: GPS
+        author: Bartosz Ciechanowski
+        url: https://ciechanow.ski/gps/
+    - "19:00":
+        title: Curves and Surfaces
+        author: Bartosz Ciechanowski
+        url: https://ciechanow.ski/curves-and-surfaces/
+    - "19:30":
+        title: Cameras and Lenses
+        author: Bartosz Ciechanowski
+        url: https://ciechanow.ski/cameras-and-lenses/
+  friday:
+    - "00:00":
+        title: Hexagonal Grids
+        author: Amit Patel
+        url: https://www.redblobgames.com/grids/hexagons/
+    - "13:00":
+        title: Many Tiny Things
+        url: https://manytinythings.github.io/
+  saturday:
+    - "11:30":
+        title: Adventures With Anxiety
+        author: Nicky Case
+        url: https://ncase.me/anxiety/
+    - "19:00":
+        title: Jackie's OS
+        url: https://jackies.world/
+    - "19:30": null
+  sunday:

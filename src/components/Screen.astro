@@ -1,0 +1,414 @@
+---
+import Menu from "./Menu.astro";
+import Static from "./Static.astro";
+interface Props {
+  channelId: string;
+  channelName: string;
+}
+
+const { channelId, channelName }: Props = Astro.props;
+---
+
+<div class="screen" data-power="on" data-booting="false">
+  <div class="screen-blur" data-brightness="0" data-color="0" data-tint="0">
+  </div>
+  <div class="scanlines" data-active="true"></div>
+  <div class="channel-number">CH {channelId ?? "??"}</div>
+  <div class="channel-name">{channelName}</div>
+  <div class="screen-content" data-horizontal="0" data-vertical="0">
+    <Menu />
+    <slot />
+    <Static />
+  </div>
+</div>
+
+<script>
+  // Listen for scanline toggle events
+  document.addEventListener("scanlineToggle", ((e: CustomEvent) => {
+    const scanlines = document.querySelector(".scanlines");
+    if (scanlines) {
+      scanlines.setAttribute(
+        "data-active",
+        e.detail.enabled ? "true" : "false",
+      );
+    }
+  }) as EventListener);
+
+  // Initialize scanlines state from localStorage
+  const scanlines = document.querySelector(".scanlines");
+  if (scanlines) {
+    const savedState = localStorage.getItem("scanlines") === "true";
+    scanlines.setAttribute("data-active", savedState ? "true" : "false");
+  }
+
+  // Listen for brightness change events
+  document.addEventListener("brightnessChange", ((e: CustomEvent) => {
+    const brightness = e.detail.brightness;
+    const blur = document.querySelector(".screen-blur");
+    if (blur) {
+      blur.setAttribute("data-brightness", brightness);
+    }
+  }) as EventListener);
+
+  // Listen for color change events
+  document.addEventListener("colorChange", ((e: CustomEvent) => {
+    const color = e.detail.color;
+    const blur = document.querySelector(".screen-blur");
+    if (blur) {
+      blur.setAttribute("data-color", color);
+    }
+  }) as EventListener);
+
+  // Listen for tint change events
+  document.addEventListener("tintChange", ((e: CustomEvent) => {
+    const tint = e.detail.tint;
+    const blur = document.querySelector(".screen-blur");
+    if (blur) {
+      blur.setAttribute("data-tint", tint);
+    }
+  }) as EventListener);
+
+  // Initialize brightness and color state from localStorage
+  const blur = document.querySelector(".screen-blur");
+  if (blur) {
+    const savedBrightness = localStorage.getItem("brightness") || "0";
+    const savedColor = localStorage.getItem("color") || "0";
+    const savedTint = localStorage.getItem("tint") || "0";
+
+    blur.setAttribute("data-brightness", savedBrightness);
+    blur.setAttribute("data-color", savedColor);
+    blur.setAttribute("data-tint", savedTint);
+  }
+
+  // Listen for horizontal and vertical change events
+  document.addEventListener("horizontalChange", ((e: CustomEvent) => {
+    const horizontal = e.detail.horizontal;
+    const content = document.querySelector(".screen-content");
+    if (content) {
+      content.setAttribute("data-horizontal", horizontal);
+    }
+  }) as EventListener);
+
+  document.addEventListener("verticalChange", ((e: CustomEvent) => {
+    const vertical = e.detail.vertical;
+    const content = document.querySelector(".screen-content");
+    if (content) {
+      content.setAttribute("data-vertical", vertical);
+    }
+  }) as EventListener);
+
+  // Initialize horizontal and vertical state from localStorage
+  const content = document.querySelector(".screen-content");
+  if (content) {
+    const savedHorizontal = localStorage.getItem("horizontal") || "0";
+    const savedVertical = localStorage.getItem("vertical") || "0";
+
+    content.setAttribute("data-horizontal", savedHorizontal);
+    content.setAttribute("data-vertical", savedVertical);
+  }
+</script>
+
+<style>
+  @keyframes scanline {
+    0% {
+      transform: translate3d(0, -20vh, 0) skewY(1deg);
+    }
+
+    40%,
+    100% {
+      transform: translate3d(0, 100vh, 0) skewY(1deg);
+    }
+  }
+
+  @keyframes power-off {
+    68% {
+      transform: scale(1, 0.01);
+    }
+    99% {
+      transform: scale(0, 0.001);
+    }
+    100% {
+      transform: scale(0, 0);
+    }
+  }
+
+  @keyframes power-on {
+    0% {
+      opacity: 0;
+      filter: grayscale(100%);
+    }
+    100% {
+      opacity: 1;
+      filter: grayscale(0%);
+    }
+  }
+
+  .screen {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    overflow: hidden;
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("/assets/crt.png");
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-position: center;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    &[data-booting="true"] {
+      animation: power-on 6s 10ms ease-out both;
+    }
+
+    &[data-power="off"] {
+      animation: power-off 300ms 20ms ease both;
+    }
+  }
+
+  .screen-content {
+    /* Default values */
+    --horizontal: 0;
+    --vertical: 0;
+
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    transform: scaleX(var(--horizontal)) scaleY(var(--vertical));
+
+    &[data-horizontal="-3"] {
+      --horizontal: 94%;
+    }
+
+    &[data-horizontal="-2"] {
+      --horizontal: 96%;
+    }
+
+    &[data-horizontal="-1"] {
+      --horizontal: 98%;
+    }
+
+    &[data-horizontal="0"] {
+      --horizontal: 100%;
+    }
+
+    &[data-horizontal="1"] {
+      --horizontal: 102%;
+    }
+
+    &[data-horizontal="2"] {
+      --horizontal: 104%;
+    }
+
+    &[data-horizontal="3"] {
+      --horizontal: 106%;
+    }
+
+    &[data-vertical="-3"] {
+      --vertical: 94%;
+    }
+
+    &[data-vertical="-2"] {
+      --vertical: 96%;
+    }
+
+    &[data-vertical="-1"] {
+      --vertical: 98%;
+    }
+
+    &[data-vertical="0"] {
+      --vertical: 100%;
+    }
+
+    &[data-vertical="1"] {
+      --vertical: 102%;
+    }
+
+    &[data-vertical="2"] {
+      --vertical: 104%;
+    }
+
+    &[data-vertical="3"] {
+      --vertical: 106%;
+    }
+  }
+
+  .screen-blur {
+    /* Default values */
+    --brightness: 1;
+    --saturation: 1;
+    --tint: 0deg;
+
+    content: "";
+    position: absolute;
+    inset: 0;
+    backdrop-filter: blur(0.5px) brightness(var(--brightness))
+      saturate(var(--saturation)) hue-rotate(var(--tint));
+    pointer-events: none;
+    border-radius: 0.5em;
+    z-index: 3;
+    overflow: hidden;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.08) 10%,
+      transparent 30%,
+      transparent 60%,
+      rgba(0, 0, 0, 0.08) 90%,
+      rgba(0, 0, 0, 0.2) 100%
+    );
+
+    /* Brightness */
+    &[data-brightness="-3"] {
+      --brightness: 0.3;
+    }
+    &[data-brightness="-2"] {
+      --brightness: 0.5;
+    }
+    &[data-brightness="-1"] {
+      --brightness: 0.7;
+    }
+    &[data-brightness="0"] {
+      --brightness: 1;
+    }
+    &[data-brightness="1"] {
+      --brightness: 1.5;
+    }
+    &[data-brightness="2"] {
+      --brightness: 2;
+    }
+    &[data-brightness="3"] {
+      --brightness: 3;
+    }
+
+    /* Saturation */
+    &[data-color="-3"] {
+      --saturation: 0;
+    }
+    &[data-color="-2"] {
+      --saturation: 0.5;
+    }
+    &[data-color="-1"] {
+      --saturation: 0.7;
+    }
+    &[data-color="0"] {
+      --saturation: 1;
+    }
+    &[data-color="1"] {
+      --saturation: 1.2;
+    }
+    &[data-color="2"] {
+      --saturation: 1.5;
+    }
+    &[data-color="3"] {
+      --saturation: 2;
+    }
+
+    /* Sharpness */
+    &[data-tint="-3"] {
+      --tint: -90deg;
+    }
+    &[data-tint="-2"] {
+      --tint: -60deg;
+    }
+    &[data-tint="-1"] {
+      --tint: -30deg;
+    }
+    &[data-tint="0"] {
+      --tint: 0deg;
+    }
+    &[data-tint="1"] {
+      --tint: 15deg;
+    }
+    &[data-tint="2"] {
+      --tint: 30deg;
+    }
+    &[data-tint="3"] {
+      --tint: 45deg;
+    }
+  }
+
+  .scanlines {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    overflow: hidden;
+    pointer-events: none;
+    background-image: linear-gradient(
+        to bottom,
+        transparent 60%,
+        rgba(0, 0, 0, 0.7) 10%
+      ),
+      linear-gradient(to right, transparent 80%, rgba(0, 0, 0, 0.1) 10%);
+    background-size: 3px 3px;
+
+    &[data-active="false"] {
+      display: none;
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.1),
+        transparent
+      );
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      background-image: linear-gradient(
+        to bottom,
+        transparent 60%,
+        rgba(0, 0, 0, 0.04) 10%
+      );
+      background-size: 3px 3px;
+      opacity: 1;
+      height: 5vh;
+      animation: scanline 17s linear infinite -6s;
+    }
+  }
+
+  @keyframes disappear {
+    0% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .channel-number,
+  .channel-name {
+    position: absolute;
+    top: 5vh;
+    font-size: 4vw;
+    font-weight: bold;
+    color: lime;
+    text-shadow:
+      0.06em 0 0.01em rgba(0, 0, 0, 0.8),
+      -0.1em 0 0.1em rgba(0, 255, 0, 0.5);
+    font-family: "Better VCR", monospace;
+    animation: disappear 3s step-end forwards;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .channel-number {
+    left: 5vw;
+  }
+
+  .channel-name {
+    right: 5vw;
+  }
+</style>

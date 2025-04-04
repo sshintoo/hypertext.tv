@@ -1,0 +1,330 @@
+---
+import type { ActiveProgram } from "@types";
+
+interface Props {
+  channelId: string;
+  activeProgram?: ActiveProgram | null;
+}
+
+const { activeProgram } = Astro.props;
+const { program, startTime, endTime } = activeProgram ?? {};
+const { title, url } = program ?? {};
+
+function getReadableTime(timeStr: string | undefined) {
+  if (!timeStr) return "00:00";
+
+  // Create a new date and set it to the time from the string
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  const date = new Date();
+  date.setHours(hours, minutes, 0, 0);
+
+  return date.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+}
+
+const readableEndTime = getReadableTime(endTime)?.split(" ")[0];
+const isAm = getReadableTime(endTime)?.split(" ")[1] === "AM";
+
+const day = new Date().toLocaleDateString("en-US", { weekday: "short" });
+const isAiring = Boolean(startTime && endTime) && program !== null;
+---
+
+<channel-display data-title={title} data-url={url} data-power="on">
+  <header class="display">
+    <div
+      class="title"
+      data-title={title}
+      data-scroll={Boolean((title?.length ?? 0) > 17)}
+    >
+      <span class="title-contents">
+        {
+          program && program.url ? (
+            <a href={url}>{title?.slice(0, 17)}</a>
+          ) : program ? (
+            <span>{title?.slice(0, 17)}</span>
+          ) : (
+            <span>Nothing scheduled</span>
+          )
+        }
+      </span>
+      <span class="title-background" aria-hidden="true">#################</span>
+    </div>
+
+    <div class="secondary">
+      <div class="airing" data-active={isAiring || title === "TV Guide"}>
+        <div class="airing-indicator"></div>
+        Live
+      </div>
+      <div class="times">
+        <span data-active={isAiring}>Until</span>
+        <time datetime={endTime} data-active={isAiring}>
+          {readableEndTime}
+        </time>
+        <span
+          class="am-pm"
+          data-active={Boolean(isAm && isAiring)}
+          aria-hidden={Boolean(!isAm || !isAiring)}
+        >
+          AM
+        </span>
+        <span
+          class="am-pm"
+          data-active={Boolean(!isAm && isAiring)}
+          aria-hidden={Boolean(isAm || !isAiring)}
+        >
+          PM
+        </span>
+      </div>
+      <div class="days">
+        <span data-active={isAiring && day === "Mon"}>Mo</span>
+        <span data-active={isAiring && day === "Tue"}>Tu</span>
+        <span data-active={isAiring && day === "Wed"}>We</span>
+        <span data-active={isAiring && day === "Thu"}>Th</span>
+        <span data-active={isAiring && day === "Fri"}>Fr</span>
+        <span data-active={isAiring && day === "Sat"}>Sa</span>
+        <span data-active={isAiring && day === "Sun"}>Su</span>
+      </div>
+    </div>
+  </header>
+</channel-display>
+
+<script>
+  class ChannelDisplay extends HTMLElement {
+    intervalId: number | null = null;
+    timeoutId: number | null = null;
+
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+      const title = this.dataset.title;
+      const totalChars = 17;
+      const isActive = this.dataset.power === "on";
+
+      if (title && title.length > totalChars && isActive) {
+        this.timeoutId = setTimeout(
+          () => this.scrollTitle(title, totalChars),
+          100,
+        );
+      }
+
+      // Add event listeners for cleanup
+      document.addEventListener("astro:before-swap", () => this.clearTimers());
+      document.addEventListener("astro:after-swap", () => this.clearTimers());
+    }
+
+    disconnectedCallback() {
+      this.clearTimers();
+    }
+
+    clearTimers() {
+      if (this.intervalId !== null) {
+        clearInterval(this.intervalId);
+        this.intervalId = null;
+      }
+      if (this.timeoutId !== null) {
+        clearTimeout(this.timeoutId);
+        this.timeoutId = null;
+      }
+    }
+
+    scrollTitle(title: string, totalChars: number) {
+      const titleLink = this.querySelector(".title a");
+      if (!titleLink) return;
+
+      let startIndex = 0;
+      let direction = 1; // 1 for right, -1 for left
+      const maxIndex = Math.max(0, title.length - totalChars);
+      let pauseCount = 0;
+      const pauseDurationEnd = 8; // How many ticks to pause at each end
+      const pauseDurationStart = 16;
+
+      this.intervalId = setInterval(() => {
+        if (pauseCount > 0) {
+          pauseCount--;
+          return;
+        }
+
+        const activeChars = title.slice(startIndex, startIndex + totalChars);
+        titleLink.textContent = activeChars;
+
+        if (
+          (startIndex >= maxIndex && direction === 1) ||
+          (startIndex <= 0 && direction === -1)
+        ) {
+          direction *= -1; // Reverse direction
+          if (direction === 1) {
+            pauseCount = pauseDurationStart;
+          } else {
+            pauseCount = pauseDurationEnd;
+          }
+          return;
+        }
+
+        startIndex += direction;
+      }, 300);
+    }
+  }
+
+  // Define the custom element
+  customElements.define("channel-display", ChannelDisplay);
+</script>
+
+<style>
+  @keyframes scroll-text {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes live-pulse {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .display {
+    --phosphor-active: rgb(94, 191, 252);
+    --phosphor-inactive: color-mix(
+      in srgb,
+      var(--phosphor-active) 15%,
+      transparent
+    );
+
+    --phosphor-glow: 0 0 2px color-mix(in srgb, currentColor 50%, transparent),
+      0 0 4px color-mix(in srgb, currentColor 40%, transparent),
+      0 0 8px color-mix(in srgb, currentColor 30%, transparent);
+
+    background: black;
+    border-radius: 1rem;
+    height: 4rem;
+    width: min-content;
+    font-size: 1.3rem;
+    padding-inline: 1.5ch;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 1px rgba(255, 255, 255, 0.1);
+    user-select: none;
+    line-height: 1;
+    overflow: hidden;
+    text-transform: uppercase;
+
+    * {
+      transition: all 0.3s ease-out;
+    }
+
+    a {
+      color: var(--phosphor-active);
+      text-decoration: none;
+    }
+
+    .title {
+      font-family: "DSEG 14", monospace;
+      font-weight: 400;
+      color: var(--phosphor-active);
+      text-shadow: var(--phosphor-glow);
+      text-wrap: nowrap;
+      line-height: 1;
+
+      &[data-scroll="true"] a {
+        white-space: pre;
+      }
+
+      a {
+        border-radius: 0.2rem;
+      }
+    }
+
+    .title-contents {
+      position: absolute;
+      z-index: 1;
+    }
+
+    .title-background {
+      color: var(--phosphor-inactive);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .secondary {
+      color: color-mix(in srgb, var(--phosphor-active) 40%, transparent);
+      font-size: 0.48em;
+      margin-bottom: -0.4rem;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      letter-spacing: 0.1em;
+      white-space: nowrap;
+    }
+
+    .airing {
+      --phosphor-active: rgb(255, 100, 100);
+      color: var(--phosphor-inactive);
+      display: flex;
+      align-items: center;
+    }
+
+    .airing-indicator {
+      content: "";
+      display: inline-block;
+      width: 0.5em;
+      height: 0.5em;
+      background: var(--phosphor-inactive);
+      border-radius: 50%;
+      margin-right: 0.5em;
+    }
+
+    .days {
+      color: var(--phosphor-inactive);
+    }
+
+    .times {
+      color: var(--phosphor-inactive);
+    }
+
+    [data-active="true"] {
+      color: var(--phosphor-active);
+      text-shadow: var(--phosphor-glow);
+
+      .airing-indicator {
+        background: var(--phosphor-active);
+        box-shadow: var(--phosphor-glow);
+        animation: live-pulse 3s ease infinite;
+      }
+    }
+  }
+
+  [data-power="off"] {
+    .title-contents {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    [data-active="true"] {
+      color: var(--phosphor-inactive);
+      text-shadow: none;
+
+      .airing-indicator {
+        background: var(--phosphor-inactive);
+        box-shadow: none;
+        animation: none;
+      }
+    }
+  }
+</style>

@@ -1,0 +1,410 @@
+---
+import { getCollection, getEntry } from "astro:content";
+import { findActiveProgram } from "@utils/findActiveProgram";
+import RotatingLogo from "./RotatingLogo.astro";
+
+const channels = await getCollection("channels");
+const sortedChannels = channels.sort((a, b) =>
+  a.data.slug.localeCompare(b.data.slug),
+);
+
+const currentTime = new Date();
+const currentHour = currentTime.getHours();
+const currentMinute = currentTime.getMinutes();
+const nextHour = currentHour + 1;
+
+let timeBlocks = [];
+const createTimeBlock = (hour: number, minute: number) => {
+  const date = new Date();
+  date.setHours(hour, minute, 0); // Set hours, minutes, and 0 seconds
+  return date;
+};
+
+if (currentMinute >= 55) {
+  // If between H:55 and H:60, show the next 30 min block
+  timeBlocks = [
+    createTimeBlock(nextHour, 0),
+    createTimeBlock(nextHour, 30),
+    createTimeBlock(nextHour + 1, 0),
+  ];
+} else if (currentMinute >= 30 && currentMinute < 55) {
+  // If between H:30 and H:55, show the current 30 min block
+  timeBlocks = [
+    createTimeBlock(currentHour, 30),
+    createTimeBlock(nextHour, 0),
+    createTimeBlock(nextHour, 30),
+  ];
+} else if (currentMinute >= 25 && currentMinute < 30) {
+  // If between H:25 and H:30, show the next 30 min block
+  timeBlocks = [
+    createTimeBlock(currentHour, 30),
+    createTimeBlock(nextHour, 0),
+    createTimeBlock(nextHour, 30),
+  ];
+} else {
+  // If between H:00 and H:25, show the current 30 min block
+  timeBlocks = [
+    createTimeBlock(currentHour, 0),
+    createTimeBlock(currentHour, 30),
+    createTimeBlock(nextHour, 0),
+  ];
+}
+
+async function getTimeBlocksForChannel(blocks: Date[], channelId: string) {
+  const channel = await getEntry("channels", channelId);
+  if (!channel)
+    return blocks.map(() => ({
+      title: "",
+      span: 1,
+      continuesBefore: false,
+      continuesAfter: false,
+    }));
+
+  // Create the before/after blocks for checking continuity
+  const blockBefore = new Date(blocks[0].getTime() - 30 * 60000);
+  const blockAfter = new Date(blocks[blocks.length - 1].getTime() + 30 * 60000);
+
+  // Get programs for visible blocks
+  const programs = await Promise.all(
+    blocks.map((block) => {
+      const program = findActiveProgram(channel.data.schedule, block);
+      return program?.program?.title ?? "";
+    }),
+  );
+
+  // Get programs for before/after blocks
+  const programBefore = findActiveProgram(channel.data.schedule, blockBefore);
+  const programAfter = findActiveProgram(channel.data.schedule, blockAfter);
+
+  return programs.reduce(
+    (
+      acc: Array<{
+        title: string;
+        span: number;
+        continuesBefore: boolean;
+        continuesAfter: boolean;
+      }>,
+      title: string,
+      index: number,
+    ) => {
+      if (index === 0 || title !== programs[index - 1]) {
+        const nextDifferentIndex = programs
+          .slice(index)
+          .findIndex((t: string) => t !== title);
+        const span =
+          nextDifferentIndex === -1
+            ? programs.length - index
+            : nextDifferentIndex;
+
+        // Check if program continues before/after visible blocks
+        const isFirstBlock = index === 0;
+        const isLastBlock = index + span === blocks.length;
+
+        const programStartsEarlier =
+          isFirstBlock && programBefore?.program?.title === title;
+        const programContinuesLater =
+          isLastBlock && programAfter?.program?.title === title;
+
+        acc.push({
+          title,
+          span,
+          continuesBefore: programStartsEarlier,
+          continuesAfter: programContinuesLater,
+        });
+      }
+      return acc;
+    },
+    [],
+  );
+}
+---
+
+<main class="guide">
+  <header>
+    <RotatingLogo />
+  </header>
+  <div class="channel-header">
+    <div class="container">
+      <div class="time-container">
+        <time datetime={currentTime.toLocaleTimeString()} id="current-time">
+          {currentTime.toLocaleTimeString()}
+        </time>
+        {
+          timeBlocks.map((block) => (
+            <div>
+              {block.toLocaleTimeString([], {
+                hour: "numeric",
+                minute: "2-digit",
+              })}
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+  <section id="contents">
+    <div class="scroll">
+      <ul class="container">
+        {
+          sortedChannels.map(({ data: { slug, name } }) => (
+            <li class="channel-row">
+              <a class="channel-info" href={`/ch/${slug}`}>
+                <span class="channel-number">{slug}</span>
+                <span class="channel-name">{name}</span>
+              </a>
+              {getTimeBlocksForChannel(timeBlocks, slug).then((blocks) =>
+                blocks.map(
+                  ({ title, span, continuesBefore, continuesAfter }) => (
+                    <div
+                      class="program-info"
+                      data-span={span}
+                      data-empty={!title}
+                    >
+                      <div
+                        class="program-contents"
+                        data-continues-before={continuesBefore}
+                        data-continues-after={continuesAfter}
+                      >
+                        {title}
+                      </div>
+                    </div>
+                  ),
+                ),
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+  const currentTimeElement = document.getElementById("current-time");
+
+  if (currentTimeElement) {
+    setInterval(() => {
+      let currentTime = new Date().toLocaleTimeString();
+      currentTimeElement.textContent = currentTime;
+    }, 1000);
+  }
+
+  // Automatically scroll the channel contents slowly
+  const contents = document.getElementById("contents");
+  const container = contents?.querySelector(".scroll");
+
+  if (contents && container) {
+    const cloned = container.cloneNode(true);
+    contents.appendChild(cloned);
+
+    const threshold = 120;
+
+    contents.scrollTo(0, threshold);
+
+    contents.addEventListener("scroll", () => {
+      const halfHeight = container.clientHeight;
+
+      if (contents.scrollTop > halfHeight + threshold) {
+        contents.scrollTo(0, contents.scrollTop - halfHeight);
+      } else if (contents.scrollTop < threshold) {
+        contents.scrollTo(0, halfHeight + contents.scrollTop);
+      }
+    });
+
+    setInterval(() => {
+      contents.scrollBy(0, 1);
+    }, 40);
+  }
+</script>
+
+<style>
+  .guide {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    max-height: 100%;
+    overflow: hidden;
+    background-color: black;
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: 1fr auto 2fr;
+    font-size: 20px;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+    user-select: none;
+  }
+
+  header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(to bottom, black, blue);
+    min-height: 0;
+  }
+
+  #contents {
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+
+  .container {
+    max-width: 1024px;
+    width: 100%;
+    padding-block: 1rem;
+    margin: 0 auto;
+    padding-inline: 24px;
+    list-style-type: none;
+  }
+
+  .channel-header {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    background: linear-gradient(
+      to bottom,
+      #e2e2e2 0%,
+      #dbdbdb 50%,
+      #d1d1d1 51%,
+      #fefefe 100%
+    );
+    color: #333;
+    text-shadow: 0 2px 1px rgba(255, 255, 255, 0.8);
+    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.4);
+    font-weight: bold;
+  }
+
+  .time-container {
+    text-align: center;
+
+    & * + * {
+      box-shadow:
+        inset 1.5px 0 0 rgba(0, 0, 0, 0.25),
+        -1.5px 0 0 rgba(255, 255, 255, 1);
+    }
+  }
+
+  .time-container,
+  .channel-row {
+    display: grid;
+    grid-template-columns: 120px repeat(3, 1fr);
+  }
+
+  .channel-info {
+    background: linear-gradient(to top, rgb(161, 0, 0), rgb(95, 0, 0));
+    color: yellow;
+    text-shadow: 0 2px 1px rgba(0, 0, 0, 0.5);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    line-height: 1.2;
+    text-decoration: none;
+    font-weight: bold;
+    position: relative;
+  }
+
+  .channel-row {
+    align-items: center;
+    justify-content: center;
+    height: 4.5rem;
+    gap: 0.5rem;
+    padding-block: 0.25rem;
+  }
+
+  .program-info {
+    background: linear-gradient(to top, rgb(0, 0, 197), rgb(0, 0, 128));
+    color: #eeeeee;
+    text-shadow: 0 2px 1px rgba(0, 0, 0, 0.5);
+    font-weight: bold;
+    height: 100%;
+    position: relative;
+    line-height: 1.2;
+
+    &[data-empty="true"] {
+      background: #040a2b;
+      text-align: center;
+
+      &::before {
+        content: "No schedule";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: rgba(255, 255, 255, 0.6);
+      }
+    }
+
+    &[data-span="1"] {
+      grid-column: span 1;
+    }
+
+    &[data-span="2"] {
+      grid-column: span 2;
+    }
+
+    &[data-span="3"] {
+      grid-column: span 3;
+    }
+  }
+
+  .channel-info,
+  .program-info {
+    min-height: 0;
+    padding-inline: 1rem;
+    border-radius: 0.75rem;
+
+    &:not([data-empty="true"])::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 5px solid transparent;
+      background: linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0),
+          rgba(255, 255, 255, 0),
+          rgba(255, 255, 255, 0.2)
+        )
+        border-box;
+      border-radius: 0.75rem;
+      mask:
+        linear-gradient(#fff 0 0) padding-box,
+        linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+      mix-blend-mode: screen;
+    }
+  }
+
+  .program-contents {
+    display: flex;
+    align-items: center;
+    height: 100%;
+
+    &[data-continues-before="true"]::before,
+    &[data-continues-after="true"]::after {
+      content: "";
+      width: 2rem;
+      height: 2rem;
+      position: absolute;
+    }
+
+    &[data-continues-before="true"] {
+      padding-left: 1rem;
+
+      &::before {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='rgba(171, 197, 255, 0.5)'%3E%3Cpath d='M8.3685 12L13.1162 3.03212L14.8838 3.9679L10.6315 12L14.8838 20.0321L13.1162 20.9679L8.3685 12Z'%3E%3C/path%3E%3C/svg%3E");
+        left: 0;
+      }
+    }
+
+    &[data-continues-after="true"] {
+      padding-right: 1rem;
+
+      &::after {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='rgba(171, 197, 255, 0.5)'%3E%3Cpath d='M15.6315 12L10.8838 3.03212L9.11622 3.9679L13.3685 12L9.11622 20.0321L10.8838 20.9679L15.6315 12Z'%3E%3C/path%3E%3C/svg%3E");
+        right: 0;
+      }
+    }
+  }
+</style>

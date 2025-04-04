@@ -1,0 +1,59 @@
+---
+import { Image } from "astro:assets";
+import arena from "../_images/are.na.svg";
+import astro from "../_images/astro.svg";
+import biome from "../_images/biome.svg";
+import codepen from "../_images/codepen.svg";
+import figma from "../_images/figma.svg";
+import frontendHorse from "../_images/frontend-horse.svg";
+import sfpc from "../_images/sfpc.svg";
+import three from "../_images/three.svg";
+---
+
+<section>
+  <h2>Special Thanks</h2>
+  <div class="thanks">
+    <a href="https://astro.build/">
+      <Image src={astro} alt="Astro" height={64} />
+    </a>
+    <a href="https://biomejs.dev/">
+      <Image src={biome} alt="Biome" height={48} />
+    </a>
+    <a href="https://codepen.io/">
+      <Image src={codepen} alt="Codepen" height={44} />
+    </a>
+    <a href="https://www.figma.com/">
+      <Image src={figma} alt="Figma" height={48} />
+    </a>
+    <a href="https://threejs.org/">
+      <Image src={three} alt="Three.js" height={68} />
+    </a>
+    <a href="https://are.na/">
+      <Image src={arena} alt="Are.na" height={48} />
+    </a>
+    <a href="https://frontend.horse/">
+      <Image src={frontendHorse} alt="Frontend Horse" height={80} />
+    </a>
+    <a href="https://sfpc.study/">
+      <Image src={sfpc} alt="SFPC" height={68} />
+    </a>
+  </div>
+</section>
+
+<style>
+  .thanks {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    row-gap: 3rem;
+    align-items: center;
+    justify-items: center;
+
+    @media (width < 1200px) {
+      max-width: 600px;
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

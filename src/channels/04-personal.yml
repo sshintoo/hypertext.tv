@@ -1,0 +1,60 @@
+slug: "04"
+name: Personal
+schedule:
+  monday:
+    - "00:00":
+        title: Eva Decker
+        author: Eva Decker
+        url: https://eva.town
+    - "16:00":
+        title: Cindy Hu
+        author: Cindy Hu
+        url: https://cindy-hu.com/
+  tuesday:
+    - "01:00":
+        title: Larissa Pham
+        author: Larissa Pham
+        url: https://larissapham.com/
+    - "02:00":
+        title: Mariana Sissia
+        author: Mariana Sissia
+        url: https://marianasissia.com/index.php/en
+    - "03:00":
+        title: Katie Stout
+        author: Katie Stout
+        url: https://www.katiestout.com/
+    - "13:00": null
+  wednesday:
+    - "00:00":
+        title: Halim Lee
+        author: Halim Lee
+        url: https://leehalim.com/
+    - "01:00":
+        title: Maggie Appleton
+        author: Maggie Appleton
+        url: https://maggieappleton.com/
+  thursday:
+    - "02:00":
+        title: Kate Bagenzo
+        author: Kate Bagenzo
+        url: https://bagenzos.house/
+  friday:
+  saturday:
+    - "00:00":
+        title: Ben West
+        author: Ben West
+        url: https://bewe.me/
+    - "12:30":
+        title: Allen Bukoff
+        author: Allen Bukoff
+        url: https://www.allenbukoff.com/
+    - "13:00":
+        title: Martin Lindberg
+        author: Martin Lindberg
+        url: https://www.martinlindberg.me/
+    - "13:30":
+        title: Anh Vu
+        author: Anh Vu
+        url: https://anhvn.com/
+    - "21:00": null
+  sunday:

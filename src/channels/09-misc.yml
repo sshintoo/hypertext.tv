@@ -1,0 +1,26 @@
+slug: "09"
+name: Misc
+schedule:
+  monday:
+  tuesday:
+  wednesday:
+    - "00:00":
+        title: Cube Rule
+        url: https://cuberule.com/
+  thursday:
+    - "00:00":
+        title: Cavity
+        url: https://thehtml.review/04/cavity/
+  friday:
+    - "23:00":
+        title: America My Face
+        author: Eva Decker
+        url: https://americamyfaceissayingeverythingthatyouneedtoknow.com/
+  saturday:
+    - "12:30": null
+    - "13:00":
+        title: Plaintext Distro
+        author: Em Reed
+        url: https://plaintextdistro.neocities.org/
+    - "17:30": null
+  sunday:

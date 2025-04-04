@@ -1,0 +1,434 @@
+---
+
+---
+
+<div class="menu" data-open="false">
+  <div class="menu-content" role="menu" aria-label="Menu Options">
+    <div aria-hidden="true" class="instructions">
+      <span>↑↓Select</span><span>Adjust←→</span>
+    </div>
+    <hr />
+    <button role="menuitem" tabindex="0" type="button" data-on="true"
+      >Scanlines</button
+    >
+    <label role="menuitem" tabindex="-1">
+      <span>Brightness</span>
+      <input type="range" min="-3" max="3" value="0" name="brightness" />
+    </label>
+    <label role="menuitem" tabindex="-1">
+      <span>Color</span>
+      <input type="range" min="-3" max="3" value="0" name="color" />
+    </label>
+    <label role="menuitem" tabindex="-1">
+      <span>Tint</span>
+      <input type="range" min="-3" max="3" value="0" name="tint" />
+    </label>
+    <label role="menuitem" tabindex="-1">
+      <span>Horizontal</span>
+      <input type="range" min="-3" max="3" value="0" name="horizontal" />
+    </label>
+    <label role="menuitem" tabindex="-1">
+      <span>Vertical</span>
+      <input type="range" min="-3" max="3" value="0" name="vertical" />
+    </label>
+    <hr />
+    <a
+      href="https://github.com/evadecker/hypertext.tv"
+      role="menuitem"
+      tabindex="-1">Add a website</a
+    >
+    <a
+      href="https://github.com/evadecker/hypertext.tv/issues"
+      role="menuitem"
+      tabindex="-1">Report an issue</a
+    >
+    <a href="/credits" role="menuitem" tabindex="-1">Credits</a>
+    <hr />
+    <button role="menuitem" tabindex="-1" type="button">Exit menu</button>
+  </div>
+</div>
+
+<script>
+  class MenuFocusGroup {
+    private el: HTMLElement;
+    private items: HTMLElement[];
+    private selectedIndex: number;
+
+    constructor(selector: string) {
+      this.el = document.querySelector(selector)!;
+      this.items = Array.from(this.el.querySelectorAll('[role="menuitem"]'));
+      this.selectedIndex = 0;
+
+      this.el.addEventListener("keydown", this.handleKeyDown.bind(this));
+      this.items.forEach((item) => {
+        item.addEventListener("click", this.handleClick.bind(this));
+
+        // Set up input listeners for both brightness and color sliders
+        const brightnessInput = item.querySelector("input[name='brightness']");
+        if (brightnessInput) {
+          brightnessInput.addEventListener("input", (e: Event) => {
+            const input = e.target as HTMLInputElement;
+            this.handleSliderChange("brightness", input.value);
+          });
+        }
+
+        const colorInput = item.querySelector("input[name='color']");
+        if (colorInput) {
+          colorInput.addEventListener("input", (e: Event) => {
+            const input = e.target as HTMLInputElement;
+            this.handleSliderChange("color", input.value);
+          });
+        }
+
+        const tintInput = item.querySelector("input[name='tint']");
+        if (tintInput) {
+          tintInput.addEventListener("input", (e: Event) => {
+            const input = e.target as HTMLInputElement;
+            this.handleSliderChange("tint", input.value);
+          });
+        }
+      });
+
+      // Initialize brightness from localStorage
+      const brightnessInput = this.el.querySelector(
+        "input[name='brightness']",
+      ) as HTMLInputElement;
+      if (brightnessInput) {
+        const savedBrightness = localStorage.getItem("brightness") || "0";
+        brightnessInput.value = savedBrightness;
+        this.handleSliderChange("brightness", savedBrightness);
+      }
+
+      // Initialize color from localStorage
+      const colorInput = this.el.querySelector(
+        "input[name='color']",
+      ) as HTMLInputElement;
+      if (colorInput) {
+        const savedColor = localStorage.getItem("color") || "0";
+        colorInput.value = savedColor;
+        this.handleSliderChange("color", savedColor);
+      }
+
+      // Initialize tint from localStorage
+      const tintInput = this.el.querySelector(
+        "input[name='tint']",
+      ) as HTMLInputElement;
+      if (tintInput) {
+        const savedTint = localStorage.getItem("tint") || "0";
+        tintInput.value = savedTint;
+        this.handleSliderChange("sharpness", savedTint);
+      }
+
+      // Initialize scanlines state from localStorage
+      const scanlineButton = this.items.find(
+        (item) => item.textContent?.trim() === "Scanlines",
+      );
+      if (scanlineButton) {
+        const savedState = localStorage.getItem("scanlines") === "true";
+        scanlineButton.setAttribute("data-on", savedState ? "true" : "false");
+      }
+    }
+
+    private toggleItem(item: HTMLElement) {
+      if (item.hasAttribute("data-on")) {
+        const isOn = item.getAttribute("data-on") === "true";
+        const newState = !isOn;
+        item.setAttribute("data-on", newState ? "true" : "false");
+
+        // Handle scanlines toggle
+        if (item.textContent?.trim() === "Scanlines") {
+          this.handleScanlineToggle(newState);
+        }
+      }
+    }
+
+    private handleScanlineToggle(isOn: boolean) {
+      localStorage.setItem("scanlines", isOn.toString());
+      const event = new CustomEvent("scanlineToggle", {
+        detail: { enabled: isOn },
+        bubbles: true,
+      });
+      this.el.dispatchEvent(event);
+    }
+
+    // Generic slider change handler
+    private handleSliderChange(sliderType: string, value: string) {
+      localStorage.setItem(sliderType, value);
+      const event = new CustomEvent(`${sliderType}Change`, {
+        detail: { [sliderType]: value },
+        bubbles: true,
+      });
+      this.el.dispatchEvent(event);
+    }
+
+    private handleKeyDown(e: KeyboardEvent) {
+      const currentItem = this.items[this.selectedIndex];
+      const input = currentItem.querySelector("input");
+
+      switch (e.key) {
+        case "ArrowUp": {
+          e.preventDefault();
+          if (this.selectedIndex === 0) {
+            this.selectedIndex = this.items.length - 1;
+          } else {
+            this.selectedIndex--;
+          }
+          break;
+        }
+        case "ArrowDown": {
+          e.preventDefault();
+          if (this.selectedIndex === this.items.length - 1) {
+            this.selectedIndex = 0;
+          } else {
+            this.selectedIndex++;
+          }
+          break;
+        }
+        case "ArrowLeft": {
+          e.preventDefault();
+          if (input instanceof HTMLInputElement && input.type === "range") {
+            const newValue = Math.max(
+              parseFloat(input.min),
+              parseFloat(input.value) - 1,
+            );
+            input.value = newValue.toString();
+            this.handleSliderChange(input.name, input.value);
+          } else {
+            this.toggleItem(currentItem);
+          }
+          return;
+        }
+        case "ArrowRight": {
+          e.preventDefault();
+          if (input instanceof HTMLInputElement && input.type === "range") {
+            const newValue = Math.min(
+              parseFloat(input.max),
+              parseFloat(input.value) + 1,
+            );
+            input.value = newValue.toString();
+            this.handleSliderChange(input.name, input.value);
+          } else {
+            this.toggleItem(currentItem);
+          }
+          return;
+        }
+        case "Enter":
+        case " ": {
+          // Allow default behavior for links
+          if (currentItem.tagName === "A") {
+            return;
+          }
+
+          e.preventDefault();
+          if (currentItem.textContent?.trim().startsWith("Exit")) {
+            closeMenu();
+          } else if (!input) {
+            this.toggleItem(currentItem);
+          }
+          return;
+        }
+        case "Tab": {
+          e.preventDefault();
+          if (e.shiftKey) {
+            if (this.selectedIndex === 0) {
+              this.selectedIndex = this.items.length - 1;
+            } else {
+              this.selectedIndex--;
+            }
+          } else {
+            if (this.selectedIndex === this.items.length - 1) {
+              this.selectedIndex = 0;
+            } else {
+              this.selectedIndex++;
+            }
+          }
+          break;
+        }
+      }
+      this.changeFocus(this.selectedIndex);
+    }
+
+    private handleClick(e: MouseEvent) {
+      const clickedItem = e.target as HTMLElement;
+      const menuItem = clickedItem.closest('[role="menuitem"]') as HTMLElement;
+      const newIndex = this.items.indexOf(menuItem);
+
+      if (newIndex !== -1) {
+        this.selectedIndex = newIndex;
+        this.changeFocus(this.selectedIndex);
+
+        if (menuItem.hasAttribute("data-on")) {
+          this.toggleItem(menuItem);
+        } else if (menuItem.textContent?.trim().startsWith("Exit")) {
+          closeMenu();
+        }
+      }
+    }
+
+    private changeFocus(idx: number) {
+      this.items.forEach((item) => {
+        item.tabIndex = -1;
+      });
+      const newFocusedItem = this.items[idx];
+      newFocusedItem.tabIndex = 0;
+
+      // If the menu item contains an input, focus that instead
+      const input = newFocusedItem.querySelector("input");
+      if (input instanceof HTMLInputElement) {
+        input.focus();
+      } else {
+        newFocusedItem.focus();
+      }
+    }
+  }
+
+  function openMenu() {
+    const menu = document.querySelector(".menu");
+    menu?.setAttribute("data-open", "true");
+    const firstMenuItem = menu?.querySelector('[role="menuitem"]');
+    if (firstMenuItem instanceof HTMLElement) {
+      firstMenuItem.tabIndex = 0;
+      firstMenuItem.focus();
+    }
+  }
+
+  function closeMenu() {
+    const menu = document.querySelector(".menu");
+    menu?.setAttribute("data-open", "false");
+    const menuItems = menu?.querySelectorAll(
+      '[role="menuitem"]',
+    ) as NodeListOf<HTMLElement>;
+    menuItems?.forEach((item) => {
+      item.tabIndex = -1;
+    });
+    const menuButton = document.getElementById("menu");
+    menuButton?.focus();
+  }
+
+  const menu = document.querySelector(".menu");
+  menu?.setAttribute("data-open", "false");
+  new MenuFocusGroup(".menu-content");
+
+  const menuButton = document.getElementById("menu");
+  menuButton?.addEventListener("click", () => {
+    const menu = document.querySelector(".menu");
+    const isOpen = menu?.getAttribute("data-open") === "true";
+    isOpen ? closeMenu() : openMenu();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeMenu();
+    }
+  });
+</script>
+
+<style>
+  .menu {
+    display: none;
+    pointer-events: none;
+
+    &[data-open="true"] {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      width: 100%;
+      z-index: 2;
+      pointer-events: all;
+    }
+  }
+
+  .menu-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: 19ch;
+    background-color: #000;
+    font-family: "Better VCR", monospace;
+    font-size: clamp(18px, 2.5vw, 28px);
+    color: #fff;
+    user-select: none;
+  }
+
+  a {
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .instructions {
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  input[type="range"] {
+    width: 5ch;
+    -webkit-appearance: none;
+    background: transparent;
+    height: 1em;
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-runnable-track {
+    background: #fff;
+    height: 0.25em;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 1.25em;
+    width: 0.5em;
+    margin-top: -0.5em;
+    background: #fff;
+  }
+
+  [role="menuitem"] {
+    border: none;
+    text-align: left;
+    background: transparent;
+    position: relative;
+    padding-inline: 2ch 1ch;
+    color: currentColor;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  [role="menuitem"]::before {
+    content: ">";
+    position: absolute;
+    left: 0;
+    opacity: 0;
+  }
+
+  [role="menuitem"][tabindex="0"] {
+    background: blue;
+  }
+
+  [role="menuitem"][tabindex="0"]::before {
+    opacity: 1;
+  }
+
+  [role="menuitem"][data-on]::after {
+    background-color: #fff;
+    color: #000;
+    margin-left: 1ch;
+    line-height: 1.2;
+  }
+
+  [role="menuitem"][data-on="true"]::after {
+    content: "ON";
+  }
+
+  [role="menuitem"][data-on="false"]::after {
+    content: "OFF";
+  }
+</style>

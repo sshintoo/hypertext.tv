@@ -1,0 +1,19 @@
+slug: "03"
+name: Music
+schedule:
+  monday:
+  tuesday:
+    - "00:00":
+        title: Communal Radio Club
+        url: https://communalradio.club/
+  wednesday:
+  thursday:
+    - "18:00":
+        title: Slack City
+        url: https://www.slackcity.org.uk/
+  friday:
+  saturday:
+    - "00:00":
+        title: N10.AS RADIO
+        url: https://n10.as/
+  sunday:
