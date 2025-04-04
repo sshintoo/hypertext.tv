@@ -56,35 +56,83 @@ const { prev, next } = await getPagination(channelId);
 
 <script>
   const powerButton = document.getElementById("power");
+  const screen = document.querySelector(".screen");
+  const powerIndicator = document.querySelector(".power-indicator");
+  const channelDisplay = document.querySelector("channel-display");
+  const menuButton = document.getElementById("menu");
+  const channelButtons = document.querySelectorAll(".button-group .button");
 
-  powerButton?.addEventListener("click", () => {
-    const screen = document.querySelector(".screen");
-    if (screen) {
-      const isTurningOff = screen.getAttribute("data-power") === "on";
-      screen.setAttribute("data-power", isTurningOff ? "off" : "on");
+  function updateButtonStates(powerState: string) {
+    if (powerState === "off") {
+      menuButton?.setAttribute("disabled", "true");
+      channelButtons.forEach((button) =>
+        button.setAttribute("data-disabled", "true"),
+      );
+    } else {
+      menuButton?.removeAttribute("disabled");
+      channelButtons.forEach((button) =>
+        button.removeAttribute("data-disabled"),
+      );
+    }
 
-      let timeout: number | undefined;
-      if (!isTurningOff) {
-        clearTimeout(timeout);
-        screen.setAttribute("data-booting", "true");
-        timeout = setTimeout(() => {
-          screen.setAttribute("data-booting", "false");
-        }, 6000);
+    const isBooting = screen?.hasAttribute("data-booting");
+    const isPoweringOff = screen?.hasAttribute("data-powering-off");
+
+    if (isBooting || isPoweringOff) {
+      powerButton?.setAttribute("disabled", "true");
+    } else {
+      powerButton?.removeAttribute("disabled");
+    }
+  }
+
+  function init() {
+    const savedPowerState = localStorage.getItem("power") || "on";
+
+    [screen, powerIndicator, channelDisplay].forEach((element) => {
+      element?.setAttribute("data-power", savedPowerState);
+    });
+
+    updateButtonStates(savedPowerState);
+
+    if (savedPowerState === "off") screen?.removeAttribute("data-booting");
+
+    screen?.addEventListener("animationend", function (event) {
+      if ((event as AnimationEvent).animationName === "power-off") {
+        screen.setAttribute("data-power", "off");
+        screen.removeAttribute("data-powering-off");
+        localStorage.setItem("power", "off");
+        updateButtonStates("off");
       }
+
+      if ((event as AnimationEvent).animationName === "power-on") {
+        screen.removeAttribute("data-booting");
+        updateButtonStates(screen.getAttribute("data-power") || "on");
+      }
+    });
+  }
+
+  function handlePowerButtonClick() {
+    if (!screen) return;
+
+    const isTurningOff = screen.getAttribute("data-power") === "on";
+
+    if (isTurningOff) {
+      screen.setAttribute("data-powering-off", "true");
+      updateButtonStates(screen.getAttribute("data-power") || "on");
+    } else {
+      screen.setAttribute("data-power", "on");
+      screen.setAttribute("data-booting", "true");
+      localStorage.setItem("power", "on");
+      updateButtonStates("on");
     }
 
-    const powerIndicator = document.querySelector(".power-indicator");
-    if (powerIndicator) {
-      const power = powerIndicator.getAttribute("data-power");
-      powerIndicator.setAttribute("data-power", power === "on" ? "off" : "on");
-    }
+    const newPowerState = isTurningOff ? "off" : "on";
+    powerIndicator?.setAttribute("data-power", newPowerState);
+    channelDisplay?.setAttribute("data-power", newPowerState);
+  }
 
-    const channelDisplay = document.querySelector("channel-display");
-    if (channelDisplay) {
-      const power = channelDisplay.getAttribute("data-power");
-      channelDisplay.setAttribute("data-power", power === "on" ? "off" : "on");
-    }
-  });
+  init();
+  powerButton?.addEventListener("click", handlePowerButtonClick);
 </script>
 
 <style>
@@ -125,8 +173,8 @@ const { prev, next } = await getPagination(channelId);
         "display"
         "buttons";
       gap: 1rem;
-      height: 10rem;
-      padding-block: 1.2rem;
+      height: 9.5rem;
+      padding-block: 0.8rem;
     }
 
     &::before,
@@ -286,6 +334,11 @@ const { prev, next } = await getPagination(channelId);
 
     &[data-arrow="down"] {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='rgba(100,100,100,1)'%3E%3Cpath d='M12 16L6 10H18L12 16Z'%3E%3C/path%3E%3C/svg%3E");
+    }
+
+    &[data-disabled="true"],
+    &[disabled] {
+      pointer-events: none;
     }
   }
 

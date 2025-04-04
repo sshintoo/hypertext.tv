@@ -9,7 +9,7 @@ interface Props {
 const { channelId, channelName }: Props = Astro.props;
 ---
 
-<div class="screen" data-power="on" data-booting="false">
+<div class="screen" data-power="on">
   <div class="screen-blur" data-brightness="0" data-color="0" data-tint="0">
   </div>
   <div class="scanlines" data-active="true"></div>
@@ -172,8 +172,13 @@ const { channelId, channelName }: Props = Astro.props;
       animation: power-on 6s 10ms ease-out both;
     }
 
-    &[data-power="off"] {
+    &[data-powering-off="true"] {
       animation: power-off 300ms 20ms ease both;
+    }
+
+    &[data-power="off"] {
+      opacity: 0;
+      pointer-events: none;
     }
   }
 
