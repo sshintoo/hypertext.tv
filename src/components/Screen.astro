@@ -23,89 +23,96 @@ const { channelId, channelName }: Props = Astro.props;
 </div>
 
 <script>
-  // Listen for scanline toggle events
-  document.addEventListener("scanlineToggle", ((e: CustomEvent) => {
-    const scanlines = document.querySelector(".scanlines");
-    if (scanlines) {
-      scanlines.setAttribute(
-        "data-active",
-        e.detail.enabled ? "true" : "false",
-      );
-    }
-  }) as EventListener);
-
-  // Initialize scanlines state from localStorage
-  const scanlines = document.querySelector(".scanlines");
-  if (scanlines) {
-    const savedState = localStorage.getItem("scanlines");
-    scanlines.setAttribute("data-active", savedState ?? "true");
+  function setAttributeOnElement(
+    selector: string,
+    attribute: string,
+    value: string,
+  ): void {
+    const element = document.querySelector(selector);
+    if (element) element.setAttribute(attribute, value);
   }
 
-  // Listen for brightness change events
-  document.addEventListener("brightnessChange", ((e: CustomEvent) => {
-    const brightness = e.detail.brightness;
-    const blur = document.querySelector(".screen-blur");
-    if (blur) {
-      blur.setAttribute("data-brightness", brightness);
-    }
-  }) as EventListener);
-
-  // Listen for color change events
-  document.addEventListener("colorChange", ((e: CustomEvent) => {
-    const color = e.detail.color;
-    const blur = document.querySelector(".screen-blur");
-    if (blur) {
-      blur.setAttribute("data-color", color);
-    }
-  }) as EventListener);
-
-  // Listen for tint change events
-  document.addEventListener("tintChange", ((e: CustomEvent) => {
-    const tint = e.detail.tint;
-    const blur = document.querySelector(".screen-blur");
-    if (blur) {
-      blur.setAttribute("data-tint", tint);
-    }
-  }) as EventListener);
-
-  // Initialize brightness and color state from localStorage
-  const blur = document.querySelector(".screen-blur");
-  if (blur) {
-    const savedBrightness = localStorage.getItem("brightness") || "0";
-    const savedColor = localStorage.getItem("color") || "0";
-    const savedTint = localStorage.getItem("tint") || "0";
-
-    blur.setAttribute("data-brightness", savedBrightness);
-    blur.setAttribute("data-color", savedColor);
-    blur.setAttribute("data-tint", savedTint);
+  function initializeFromLocalStorage(
+    selector: string,
+    attribute: string,
+    defaultValue: string = "0",
+  ): void {
+    const savedValue = localStorage.getItem(attribute) || defaultValue;
+    setAttributeOnElement(selector, attribute, savedValue);
   }
 
-  // Listen for horizontal and vertical change events
-  document.addEventListener("horizontalChange", ((e: CustomEvent) => {
-    const horizontal = e.detail.horizontal;
-    const content = document.querySelector(".screen-content");
-    if (content) {
-      content.setAttribute("data-horizontal", horizontal);
-    }
-  }) as EventListener);
-
-  document.addEventListener("verticalChange", ((e: CustomEvent) => {
-    const vertical = e.detail.vertical;
-    const content = document.querySelector(".screen-content");
-    if (content) {
-      content.setAttribute("data-vertical", vertical);
-    }
-  }) as EventListener);
-
-  // Initialize horizontal and vertical state from localStorage
-  const content = document.querySelector(".screen-content");
-  if (content) {
-    const savedHorizontal = localStorage.getItem("horizontal") || "0";
-    const savedVertical = localStorage.getItem("vertical") || "0";
-
-    content.setAttribute("data-horizontal", savedHorizontal);
-    content.setAttribute("data-vertical", savedVertical);
+  function createEventListener(
+    eventName: string,
+    selector: string,
+    attribute: string,
+    detailProperty?: string,
+  ): void {
+    document.addEventListener(eventName, ((e: CustomEvent) => {
+      // Use the specified detail property or fall back to the attribute name without 'data-' prefix
+      const propertyName = detailProperty || attribute.replace("data-", "");
+      const value = e.detail[propertyName];
+      setAttributeOnElement(selector, attribute, value);
+    }) as EventListener);
   }
+
+  const settings = [
+    {
+      event: "scanlineToggle",
+      selector: ".scanlines",
+      attribute: "data-active",
+      defaultValue: "true",
+      detailProperty: "enabled",
+    },
+    {
+      event: "brightnessChange",
+      selector: ".screen-blur",
+      attribute: "data-brightness",
+      detailProperty: "brightness",
+    },
+    {
+      event: "colorChange",
+      selector: ".screen-blur",
+      attribute: "data-color",
+      detailProperty: "color",
+    },
+    {
+      event: "tintChange",
+      selector: ".screen-blur",
+      attribute: "data-tint",
+      detailProperty: "tint",
+    },
+    {
+      event: "horizontalChange",
+      selector: ".screen-content",
+      attribute: "data-horizontal",
+      defaultValue: "0",
+      detailProperty: "horizontal",
+    },
+    {
+      event: "verticalChange",
+      selector: ".screen-content",
+      attribute: "data-vertical",
+      defaultValue: "0",
+      detailProperty: "vertical",
+    },
+  ];
+
+  settings.forEach((setting) => {
+    initializeFromLocalStorage(
+      setting.selector,
+      setting.attribute,
+      setting.defaultValue,
+    );
+  });
+
+  settings.forEach((setting) => {
+    createEventListener(
+      setting.event,
+      setting.selector,
+      setting.attribute,
+      setting.detailProperty,
+    );
+  });
 </script>
 
 <style>
@@ -308,7 +315,7 @@ const { channelId, channelName }: Props = Astro.props;
       --saturation: 2;
     }
 
-    /* Sharpness */
+    /* Tint */
     &[data-tint="-3"] {
       --tint: -90deg;
     }

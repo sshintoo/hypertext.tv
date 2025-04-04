@@ -53,73 +53,69 @@
     private el: HTMLElement;
     private items: HTMLElement[];
     private selectedIndex: number;
+    private settings: {
+      name: string;
+      localStorageKey: string;
+      defaultValue: string;
+      eventName: string;
+    }[];
 
     constructor(selector: string) {
       this.el = document.querySelector(selector)!;
       this.items = Array.from(this.el.querySelectorAll('[role="menuitem"]'));
       this.selectedIndex = 0;
 
+      this.settings = [
+        {
+          name: "brightness",
+          localStorageKey: "brightness",
+          defaultValue: "0",
+          eventName: "brightnessChange",
+        },
+        {
+          name: "color",
+          localStorageKey: "color",
+          defaultValue: "0",
+          eventName: "colorChange",
+        },
+        {
+          name: "tint",
+          localStorageKey: "tint",
+          defaultValue: "0",
+          eventName: "tintChange",
+        },
+        {
+          name: "horizontal",
+          localStorageKey: "horizontal",
+          defaultValue: "0",
+          eventName: "horizontalChange",
+        },
+        {
+          name: "vertical",
+          localStorageKey: "vertical",
+          defaultValue: "0",
+          eventName: "verticalChange",
+        },
+      ];
+
       this.el.addEventListener("keydown", this.handleKeyDown.bind(this));
+
       this.items.forEach((item) => {
         item.addEventListener("click", this.handleClick.bind(this));
 
-        // Set up input listeners for both brightness and color sliders
-        const brightnessInput = item.querySelector("input[name='brightness']");
-        if (brightnessInput) {
-          brightnessInput.addEventListener("input", (e: Event) => {
-            const input = e.target as HTMLInputElement;
-            this.handleSliderChange("brightness", input.value);
-          });
-        }
-
-        const colorInput = item.querySelector("input[name='color']");
-        if (colorInput) {
-          colorInput.addEventListener("input", (e: Event) => {
-            const input = e.target as HTMLInputElement;
-            this.handleSliderChange("color", input.value);
-          });
-        }
-
-        const tintInput = item.querySelector("input[name='tint']");
-        if (tintInput) {
-          tintInput.addEventListener("input", (e: Event) => {
-            const input = e.target as HTMLInputElement;
-            this.handleSliderChange("tint", input.value);
-          });
-        }
+        this.settings.forEach((setting) => {
+          const input = item.querySelector(`input[name='${setting.name}']`);
+          if (input) {
+            input.addEventListener("input", (e: Event) => {
+              const inputElement = e.target as HTMLInputElement;
+              this.handleSliderChange(setting.name, inputElement.value);
+            });
+          }
+        });
       });
 
-      // Initialize brightness from localStorage
-      const brightnessInput = this.el.querySelector(
-        "input[name='brightness']",
-      ) as HTMLInputElement;
-      if (brightnessInput) {
-        const savedBrightness = localStorage.getItem("brightness") || "0";
-        brightnessInput.value = savedBrightness;
-        this.handleSliderChange("brightness", savedBrightness);
-      }
+      this.initializeSettings();
 
-      // Initialize color from localStorage
-      const colorInput = this.el.querySelector(
-        "input[name='color']",
-      ) as HTMLInputElement;
-      if (colorInput) {
-        const savedColor = localStorage.getItem("color") || "0";
-        colorInput.value = savedColor;
-        this.handleSliderChange("color", savedColor);
-      }
-
-      // Initialize tint from localStorage
-      const tintInput = this.el.querySelector(
-        "input[name='tint']",
-      ) as HTMLInputElement;
-      if (tintInput) {
-        const savedTint = localStorage.getItem("tint") || "0";
-        tintInput.value = savedTint;
-        this.handleSliderChange("sharpness", savedTint);
-      }
-
-      // Initialize scanlines state from localStorage
       const scanlineButton = this.items.find(
         (item) => item.textContent?.trim() === "Scanlines",
       );
@@ -127,6 +123,31 @@
         const savedState = localStorage.getItem("scanlines") === "true";
         scanlineButton.setAttribute("data-on", savedState ? "true" : "false");
       }
+    }
+
+    // Public method to set the selected index and update focus
+    public setSelectedIndex(index: number): void {
+      if (index >= 0 && index < this.items.length) {
+        this.selectedIndex = index;
+        this.changeFocus(this.selectedIndex);
+      }
+    }
+
+    private initializeSettings(): void {
+      this.settings.forEach((setting) => {
+        const input = this.el.querySelector(
+          `input[name='${setting.name}']`,
+        ) as HTMLInputElement;
+
+        if (input) {
+          const savedValue =
+            localStorage.getItem(setting.localStorageKey) ||
+            setting.defaultValue;
+          input.value = savedValue;
+
+          this.handleSliderChange(setting.name, savedValue);
+        }
+      });
     }
 
     private toggleItem(item: HTMLElement) {
@@ -151,11 +172,14 @@
       this.el.dispatchEvent(event);
     }
 
-    // Generic slider change handler
     private handleSliderChange(sliderType: string, value: string) {
-      localStorage.setItem(sliderType, value);
-      const event = new CustomEvent(`${sliderType}Change`, {
-        detail: { [sliderType]: value },
+      const setting = this.settings.find((s) => s.name === sliderType);
+      if (!setting) return;
+
+      localStorage.setItem(setting.localStorageKey, value);
+
+      const event = new CustomEvent(setting.eventName, {
+        detail: { [setting.localStorageKey]: value },
         bubbles: true,
       });
       this.el.dispatchEvent(event);
@@ -282,13 +306,16 @@
     }
   }
 
+  // Create a global reference to the MenuFocusGroup instance
+  let menuFocusGroup: MenuFocusGroup;
+
   function openMenu() {
     const menu = document.querySelector(".menu");
     menu?.setAttribute("data-open", "true");
-    const firstMenuItem = menu?.querySelector('[role="menuitem"]');
-    if (firstMenuItem instanceof HTMLElement) {
-      firstMenuItem.tabIndex = 0;
-      firstMenuItem.focus();
+
+    // Reset the selected index to 0 when opening the menu
+    if (menuFocusGroup) {
+      menuFocusGroup.setSelectedIndex(0);
     }
   }
 
@@ -307,7 +334,9 @@
 
   const menu = document.querySelector(".menu");
   menu?.setAttribute("data-open", "false");
-  new MenuFocusGroup(".menu-content");
+
+  // Store the MenuFocusGroup instance in the global variable
+  menuFocusGroup = new MenuFocusGroup(".menu-content");
 
   const menuButton = document.getElementById("menu");
   menuButton?.addEventListener("click", () => {
