@@ -399,11 +399,10 @@ const { channelId, channelName }: Props = Astro.props;
   .channel-name {
     position: absolute;
     top: 5vh;
-    font-size: 4vw;
-    font-weight: bold;
+    font-size: clamp(22px, 4vw, 40px);
     color: lime;
     text-shadow:
-      0.06em 0 0.01em rgba(0, 0, 0, 0.8),
+      0.06em 0 0.01em rgba(0, 0, 0, 0.9),
       -0.1em 0 0.1em rgba(0, 255, 0, 0.5);
     font-family: "Better VCR", monospace;
     animation: disappear 3s step-end forwards;
@@ -412,10 +411,10 @@ const { channelId, channelName }: Props = Astro.props;
   }
 
   .channel-number {
-    left: 5vw;
+    left: max(5vw, 24px);
   }
 
   .channel-name {
-    right: 5vw;
+    right: max(5vw, 24px);
   }
 </style>
