@@ -9,6 +9,7 @@ export default defineConfig({
   adapter: netlify(),
   prefetch: true,
   redirects: {
+    "/ch/00": "/",
     "/about": "/credits",
     "/ch/999": "/credits",
   },

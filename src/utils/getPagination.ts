@@ -18,12 +18,12 @@ export const getPagination = async (channelId: string) => {
 
   if (!channelId || !isValidId)
     return {
-      next: `${channelPrefix}${firstChannelId}`,
+      next: "/",
       prev: `${channelPrefix}${lastChannelId}`,
     };
 
   const next = isLast
-    ? `${channelPrefix}${firstChannelId}`
+    ? "/"
     : `${channelPrefix}${twoDigits(Number(channelId) + 1)}`;
   const prev = isFirst
     ? `${channelPrefix}${lastChannelId}`
