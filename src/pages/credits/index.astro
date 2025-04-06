@@ -31,29 +31,13 @@ import Thanks from "./_sections/Thanks.astro";
 </Layout>
 
 <script>
-  // Automatically scroll the channel contents slowly
-  const contents = document.getElementById("credits");
-  const container = contents?.querySelector(".credits-content");
+  import { infiniteScrollLoop } from "../../utils/infiniteScroll";
 
-  if (contents && container) {
-    const cloned = container.cloneNode(true);
-    contents.appendChild(cloned);
+  const wrapper = document.getElementById("credits");
+  const content = wrapper?.querySelector(".credits-content") as HTMLElement;
 
-    const threshold = 120;
-
-    contents.addEventListener("scroll", () => {
-      const halfHeight = container.clientHeight;
-
-      if (contents.scrollTop > halfHeight + threshold) {
-        contents.scrollTo(0, contents.scrollTop - halfHeight);
-      } else if (contents.scrollTop < threshold) {
-        contents.scrollTo(0, halfHeight + contents.scrollTop);
-      }
-    });
-
-    setInterval(() => {
-      contents.scrollBy(0, 1);
-    }, 30);
+  if (wrapper && content) {
+    infiniteScrollLoop(wrapper, content);
   }
 </script>
 
@@ -61,7 +45,6 @@ import Thanks from "./_sections/Thanks.astro";
   #credits {
     width: 100%;
     height: 100%;
-    /* background: #000; */
     color: #fff;
     padding-inline: 2rem;
     position: relative;
