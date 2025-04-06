@@ -1,0 +1,24 @@
+---
+export const prerender = false;
+
+import IFrame from "@components/IFrame.astro";
+import Television from "@components/Television.astro";
+import Layout from "@layouts/Layout.astro";
+
+const { id } = Astro.params;
+if (!id) return Astro.redirect("/test");
+---
+
+<Layout>
+  <Television
+    activeProgram={{
+      program: {
+        title: "Site Preview",
+      },
+    }}
+    channelId="PRE"
+    channelName="Preview"
+  >
+    <IFrame src={`https://${id}`} />
+  </Television>
+</Layout>
