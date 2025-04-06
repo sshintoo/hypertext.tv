@@ -171,7 +171,9 @@
               localStorage.getItem(setting.localStorageKey) ||
               setting.defaultValue;
             input.value = savedValue;
-            this.handleSettingChange(setting.name, savedValue);
+            this.handleSettingChange(setting.name, savedValue, {
+              doNotTrack: true,
+            });
           }
         } else if (setting.type === "toggle") {
           // Initialize toggle settings
@@ -190,21 +192,11 @@
       });
     }
 
-    private toggleItem(item: HTMLElement) {
-      if (item.hasAttribute("data-on")) {
-        const isOn = item.getAttribute("data-on") === "true";
-        const newState = !isOn;
-        item.setAttribute("data-on", newState ? "true" : "false");
-
-        // Check if this is a toggleable setting
-        const settingName = item.getAttribute("data-setting");
-        if (settingName) {
-          this.handleSettingChange(settingName, newState.toString());
-        }
-      }
-    }
-
-    private handleSettingChange(settingName: string, value: string) {
+    private handleSettingChange(
+      settingName: string,
+      value: string,
+      options?: { doNotTrack?: boolean },
+    ) {
       const setting = this.settings.find((s) => s.name === settingName);
       if (!setting) return;
 
@@ -216,9 +208,12 @@
       });
       this.el.dispatchEvent(event);
 
-      Fathom.trackEvent(`menu: ${setting.eventName}`, {
-        _value: Number(value),
-      });
+      // Only track if not explicitly prevented
+      if (!options?.doNotTrack) {
+        Fathom.trackEvent(`menu: ${setting.eventName}`, {
+          _value: Number(value),
+        });
+      }
     }
 
     private handleKeyDown(e: KeyboardEvent) {
@@ -321,6 +316,20 @@
           this.toggleItem(menuItem);
         } else if (menuItem.textContent?.trim().startsWith("Exit")) {
           closeMenu();
+        }
+      }
+    }
+
+    private toggleItem(item: HTMLElement, options?: { doNotTrack?: boolean }) {
+      if (item.hasAttribute("data-on")) {
+        const isOn = item.getAttribute("data-on") === "true";
+        const newState = !isOn;
+        item.setAttribute("data-on", newState ? "true" : "false");
+
+        // Check if this is a toggleable setting
+        const settingName = item.getAttribute("data-setting");
+        if (settingName) {
+          this.handleSettingChange(settingName, newState.toString(), options);
         }
       }
     }
