@@ -38,11 +38,10 @@ import "../styles/index.css";
 			fetchpriority="high"
 			type="image/png"
 		/>
-		<script
-			src="https://cdn.usefathom.com/script.js"
-			data-site="EPXKTQED"
-			defer
-			is:inline></script>
+		<script>
+			import * as Fathom from "fathom-client";
+			Fathom.load("EPXKTQED");
+		</script>
 	</head>
 	<body>
 		<slot />

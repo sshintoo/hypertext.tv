@@ -20,6 +20,9 @@ importers:
       astro:
         specifier: ^5.5.2
         version: 5.5.2(@netlify/blobs@8.1.1)(rollup@4.35.0)(typescript@5.8.2)(yaml@2.7.0)
+      fathom-client:
+        specifier: ^3.7.2
+        version: 3.7.2
       three:
         specifier: ^0.174.0
         version: 0.174.0
@@ -1255,6 +1258,9 @@ packages:
 
   fastq@1.19.1:
     resolution: {integrity: sha512-GwLTyxkCXjXbxqIhTsMI2Nui8huMPtnxg7krajPJAjnEG/iiOS7i+zCtWGZR9G0NBKbXKh6X9m9UIsYX/N6vvQ==}
+
+  fathom-client@3.7.2:
+    resolution: {integrity: sha512-sWtaNivhg7uwp/q1bUuIiNj4LeQZMEZ5NXXFFpZ8le4uDedAfQG84gPOdYehtVXbl+1yX2s8lmXZ2+IQ9a/xxA==}
 
   fdir@6.4.3:
     resolution: {integrity: sha512-PMXmW2y1hDDfTSRc9gaXIuCCRpuoz3Kaz8cUelp3smouvfT632ozg2vrT6lJsHKKOF59YLbOGfAWGUcKEfRMQw==}
@@ -3954,6 +3960,8 @@ snapshots:
   fastq@1.19.1:
     dependencies:
       reusify: 1.1.0
+
+  fathom-client@3.7.2: {}
 
   fdir@6.4.3(picomatch@4.0.2):
     optionalDependencies:

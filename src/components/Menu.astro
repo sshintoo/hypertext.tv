@@ -53,6 +53,8 @@
 </div>
 
 <script>
+  import * as Fathom from "fathom-client";
+
   class MenuFocusGroup {
     private el: HTMLElement;
     private items: HTMLElement[];
@@ -211,6 +213,10 @@
         bubbles: true,
       });
       this.el.dispatchEvent(event);
+
+      Fathom.trackEvent(`change ${setting.eventName}`, {
+        _value: Number(value),
+      });
     }
 
     private handleKeyDown(e: KeyboardEvent) {
@@ -340,6 +346,7 @@
     const menu = document.querySelector(".menu");
     menu?.setAttribute("data-open", "true");
     if (menuFocusGroup) menuFocusGroup.setSelectedIndex(0);
+    Fathom.trackEvent("open menu");
   }
 
   function closeMenu() {
@@ -353,6 +360,7 @@
     });
     const menuButton = document.getElementById("menu");
     menuButton?.focus();
+    Fathom.trackEvent("close menu");
   }
 
   const menu = document.querySelector(".menu");
