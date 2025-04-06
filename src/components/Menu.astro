@@ -195,7 +195,7 @@
     private handleSettingChange(
       settingName: string,
       value: string,
-      options?: { doNotTrack?: boolean },
+      options: { doNotTrack?: boolean } = { doNotTrack: false },
     ) {
       const setting = this.settings.find((s) => s.name === settingName);
       if (!setting) return;
@@ -208,8 +208,7 @@
       });
       this.el.dispatchEvent(event);
 
-      // Only track if not explicitly prevented
-      if (!options?.doNotTrack) {
+      if (options.doNotTrack === false) {
         Fathom.trackEvent(`menu: ${setting.eventName}`, {
           _value: Number(value),
         });
@@ -320,7 +319,10 @@
       }
     }
 
-    private toggleItem(item: HTMLElement, options?: { doNotTrack?: boolean }) {
+    private toggleItem(
+      item: HTMLElement,
+      options: { doNotTrack?: boolean } = { doNotTrack: false },
+    ) {
       if (item.hasAttribute("data-on")) {
         const isOn = item.getAttribute("data-on") === "true";
         const newState = !isOn;
