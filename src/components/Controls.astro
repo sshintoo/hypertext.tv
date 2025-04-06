@@ -125,7 +125,7 @@ const { prev, next } = await getPagination(channelId);
     const button = event.currentTarget as HTMLAnchorElement;
     const direction =
       button.getAttribute("data-arrow") === "up" ? "next" : "previous";
-    Fathom.trackEvent(`click channel ${direction}`);
+    Fathom.trackEvent(`controls: click channel ${direction}`);
   }
 
   function handlePowerButtonClick() {
@@ -133,7 +133,7 @@ const { prev, next } = await getPagination(channelId);
 
     const isTurningOff = screen.getAttribute("data-power") === "on";
 
-    Fathom.trackEvent(`click power ${isTurningOff ? "off" : "on"}`);
+    Fathom.trackEvent(`controls: click power ${isTurningOff ? "off" : "on"}`);
 
     if (isTurningOff) {
       screen.setAttribute("data-powering-off", "true");

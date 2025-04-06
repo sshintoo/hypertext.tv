@@ -39,12 +39,14 @@
     <a
       href="https://github.com/evadecker/hypertext.tv"
       role="menuitem"
-      tabindex="-1">Add a website</a
+      tabindex="-1"
+      onclick="fathom.trackEvent('menu: click add website')">Add a website</a
     >
     <a
       href="https://github.com/evadecker/hypertext.tv/issues"
       role="menuitem"
-      tabindex="-1">Report an issue</a
+      tabindex="-1"
+      onclick="fathom.trackEvent('menu: click report issue')">Report an issue</a
     >
     <a href="/credits" role="menuitem" tabindex="-1">Credits</a>
     <hr />
@@ -214,7 +216,7 @@
       });
       this.el.dispatchEvent(event);
 
-      Fathom.trackEvent(`change ${setting.eventName}`, {
+      Fathom.trackEvent(`menu: ${setting.eventName}`, {
         _value: Number(value),
       });
     }
@@ -346,7 +348,7 @@
     const menu = document.querySelector(".menu");
     menu?.setAttribute("data-open", "true");
     if (menuFocusGroup) menuFocusGroup.setSelectedIndex(0);
-    Fathom.trackEvent("open menu");
+    Fathom.trackEvent("menu: open");
   }
 
   function closeMenu() {
@@ -360,7 +362,7 @@
     });
     const menuButton = document.getElementById("menu");
     menuButton?.focus();
-    Fathom.trackEvent("close menu");
+    Fathom.trackEvent("menu: close");
   }
 
   const menu = document.querySelector(".menu");

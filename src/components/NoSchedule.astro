@@ -35,6 +35,8 @@
 </div>
 
 <script>
+  import * as Fathom from "fathom-client";
+
   const paths = document.querySelectorAll(".no-schedule svg path");
 
   let colors = ["#FF0000", "#00FFFF", "#00FF00", "#FF00FF", "#0000FF"];
@@ -56,6 +58,7 @@
         "fill",
         getRandomColor(path.getAttribute("fill") ?? ""),
       );
+      Fathom.trackEvent("no schedule: click path");
     });
   });
 
@@ -78,6 +81,7 @@
   spans.forEach((span) => {
     span.addEventListener("click", () => {
       span.textContent = getNextLetter(span.textContent ?? "");
+      Fathom.trackEvent("no schedule: click letter");
     });
   });
 </script>
