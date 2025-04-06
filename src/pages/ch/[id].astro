@@ -6,12 +6,13 @@ import NoSchedule from "@components/NoSchedule.astro";
 import Television from "@components/Television.astro";
 import Layout from "@layouts/Layout.astro";
 import { findActiveProgram } from "@utils/findActiveProgram";
-const { id } = Astro.params;
 
+const { id } = Astro.params;
 if (!id) return Astro.redirect("/404");
 
 const channel = await getEntry("channels", id);
 if (!channel) return Astro.redirect("/404");
+
 const { name } = channel.data;
 
 const activeProgram = findActiveProgram(channel.data.schedule, new Date());

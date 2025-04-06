@@ -66,14 +66,14 @@ const isAiring = Boolean(startTime && endTime) && program !== null;
           {readableEndTime}
         </time>
         <span
-          class="am-pm"
+          class="am-pm am"
           data-active={Boolean(isAm && isAiring)}
           aria-hidden={Boolean(!isAm || !isAiring)}
         >
           AM
         </span>
         <span
-          class="am-pm"
+          class="am-pm pm"
           data-active={Boolean(!isAm && isAiring)}
           aria-hidden={Boolean(isAm || !isAiring)}
         >
@@ -114,9 +114,50 @@ const isAiring = Boolean(startTime && endTime) && program !== null;
         );
       }
 
+      // Update time display if there's an end time
+      const timeElement = this.querySelector("time");
+      if (timeElement?.getAttribute("datetime")) {
+        this.updateTimeDisplay();
+      }
+
       // Add event listeners for cleanup
       document.addEventListener("astro:before-swap", () => this.clearTimers());
       document.addEventListener("astro:after-swap", () => this.clearTimers());
+    }
+
+    updateTimeDisplay() {
+      const timeElement = this.querySelector("time");
+      if (!timeElement) return;
+
+      const timeStr = timeElement.getAttribute("datetime");
+      if (!timeStr) return;
+
+      // Parse the time string and convert to local time
+      const [hours, minutes] = timeStr.split(":").map(Number);
+      const date = new Date();
+      date.setHours(hours, minutes, 0, 0);
+
+      // Format the time
+      const formattedTime = date.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      });
+
+      // Update the time display
+      timeElement.textContent = formattedTime.split(" ")[0];
+
+      // Update AM/PM indicators
+      const isAm = formattedTime.split(" ")[1] === "AM";
+      const amElement = this.querySelector(".am-pm.am");
+      const pmElement = this.querySelector(".am-pm.pm");
+
+      if (amElement && pmElement) {
+        amElement.setAttribute("data-active", isAm.toString());
+        amElement.setAttribute("aria-hidden", (!isAm).toString());
+        pmElement.setAttribute("data-active", (!isAm).toString());
+        pmElement.setAttribute("aria-hidden", isAm.toString());
+      }
     }
 
     disconnectedCallback() {

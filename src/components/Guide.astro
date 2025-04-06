@@ -137,20 +137,19 @@ async function getTimeBlocksForChannel(blocks: Date[], channelId: string) {
         <thead>
           <tr>
             <th>
-              <time
-                datetime={currentTime.toLocaleTimeString()}
-                id="current-time"
-              >
+              <time datetime={currentTime.toISOString()} id="current-time">
                 {currentTime.toLocaleTimeString()}
               </time>
             </th>
             {
               timeBlocks.map((block) => (
-                <th>
-                  {block.toLocaleTimeString([], {
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}
+                <th class="time-block">
+                  <time datetime={block.toISOString()}>
+                    {block.toLocaleTimeString([], {
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </time>
                 </th>
               ))
             }
@@ -195,14 +194,26 @@ async function getTimeBlocksForChannel(blocks: Date[], channelId: string) {
 <script>
   import { infiniteScrollLoop } from "../utils/infiniteScroll";
 
-  const currentTimeElement = document.getElementById("current-time");
+  const updateCurrentTime = () => {
+    const currentTimeElement = document.getElementById("current-time");
+    if (currentTimeElement) {
+      const now = new Date();
+      currentTimeElement.textContent = now.toLocaleTimeString();
+    }
+  };
 
-  if (currentTimeElement) {
-    setInterval(() => {
-      let currentTime = new Date().toLocaleTimeString();
-      currentTimeElement.textContent = currentTime;
-    }, 1000);
-  }
+  setInterval(updateCurrentTime, 1000);
+
+  const timeBlocks = document.querySelectorAll(".time-block time");
+
+  // Convert server time to local time
+  timeBlocks.forEach((timeElement) => {
+    const serverTime = new Date(timeElement.getAttribute("datetime") || "");
+    timeElement.textContent = serverTime.toLocaleTimeString([], {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  });
 
   const container = document.getElementById("contents")!;
   const table = container.querySelector("table")!;
@@ -210,7 +221,6 @@ async function getTimeBlocksForChannel(blocks: Date[], channelId: string) {
 
   infiniteScrollLoop(container, content, {
     cloneInto: table,
-    scrollSpeed: window.innerWidth > 800 ? 40 : null,
   });
 </script>
 

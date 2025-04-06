@@ -26,11 +26,6 @@ export function infiniteScrollLoop(
   const cloned = content.cloneNode(true);
   target.appendChild(cloned);
 
-  // Fix mobile Safari scroll jank..?
-  if (window.innerWidth < 800) {
-    container.style.transform = "translate3d(0, 0, 0)";
-  }
-
   const threshold = Math.floor(container.clientHeight * 0.1);
 
   container.addEventListener("scroll", () => {
