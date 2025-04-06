@@ -210,6 +210,7 @@ async function getTimeBlocksForChannel(blocks: Date[], channelId: string) {
 
   infiniteScrollLoop(container, content, {
     cloneInto: table,
+    scrollSpeed: window.innerWidth > 800 ? 40 : null,
   });
 </script>
 
