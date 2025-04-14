@@ -32,6 +32,7 @@ Create a pull request against this repository by [forking it](https://docs.githu
       # The title of your website
       title: Design Is 
       # (Optional) Your name, nickname, or handle, to be displayed on the credits page
+      # Multiple authors can be listed
       author: Eva Decker 
       # A link to your website, using https://
       url: https://design.eva.town 
