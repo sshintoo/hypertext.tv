@@ -12,7 +12,7 @@ const response = await GET(Astro);
 const contributors: string[] = await response.json();
 ---
 
-<Layout>
+<Layout title="Credits">
   <Television
     activeProgram={{
       program: { title: "Site Credits" },

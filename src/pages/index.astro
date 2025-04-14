@@ -16,7 +16,7 @@ const response = await GET(Astro);
 const guideData: GuideData = await response.json();
 ---
 
-<Layout>
+<Layout title="TV Guide">
   <Television
     activeProgram={activeProgram}
     channelId={channelId}

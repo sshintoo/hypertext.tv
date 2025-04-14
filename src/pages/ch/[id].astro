@@ -19,7 +19,7 @@ const response = await GET(Astro);
 const activeProgram: ActiveProgram = await response.json();
 ---
 
-<Layout>
+<Layout title={name}>
   <Television activeProgram={activeProgram} channelId={id} channelName={name}>
     {
       activeProgram?.program ? (

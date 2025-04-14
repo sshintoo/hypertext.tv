@@ -93,8 +93,8 @@ const isAiring = Boolean(startTime && endTime) && program !== null;
 
 <script>
   class ChannelDisplay extends HTMLElement {
-    intervalId: number | null = null;
-    timeoutId: number | null = null;
+    intervalId: NodeJS.Timer | null = null;
+    timeoutId: NodeJS.Timeout | null = null;
 
     constructor() {
       super();

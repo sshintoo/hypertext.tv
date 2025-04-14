@@ -7,7 +7,7 @@ const { id } = Astro.params;
 if (!id) return Astro.redirect("/test");
 ---
 
-<Layout>
+<Layout title="Site Preview">
   <Television
     activeProgram={{
       program: {
