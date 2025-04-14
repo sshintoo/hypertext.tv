@@ -1,12 +1,12 @@
 ---
-import Television from "src/components/Television.astro";
-import Layout from "src/layouts/Layout.astro";
+import Rainbow from "@components/Rainbow.astro";
+import Television from "@components/Television.astro";
+import Layout from "@layouts/Layout.astro";
 import { GET } from "../api/contributors.json";
 import BuiltWith from "./_sections/BuiltWith.astro";
 import Featuring from "./_sections/Featuring.astro";
 import Fonts from "./_sections/Fonts.astro";
 import Intro from "./_sections/Intro.astro";
-import Rainbow from "./_sections/Rainbow.astro";
 
 const response = await GET(Astro);
 const contributors: string[] = await response.json();

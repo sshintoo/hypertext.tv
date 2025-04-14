@@ -2,11 +2,8 @@
 
 <script>
   import * as THREE from "three";
-  import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
-  import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
-  import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
-  import vertexShader from "../../../shaders/rainbow.vert?raw";
-  import fragmentShader from "../../../shaders/rainbow.frag?raw";
+  import vertexShader from "../shaders/rainbow.vert?raw";
+  import fragmentShader from "../shaders/rainbow.frag?raw";
 
   const canvas = document.getElementById("rainbow");
 
@@ -27,23 +24,18 @@
     camera.updateProjectionMatrix();
 
     const renderer = new THREE.WebGLRenderer({
-      powerPreference: "low-power",
-      alpha: true,
-      antialias: false,
-      preserveDrawingBuffer: true,
+      antialias: true,
     });
+    renderer.toneMapping = THREE.LinearToneMapping;
+    renderer.toneMappingExposure = 5;
     renderer.setAnimationLoop(animate);
     canvas.appendChild(renderer.domElement);
-
-    const composer = new EffectComposer(renderer);
 
     const resize = () => {
       camera.aspect = canvas.clientWidth / canvas.clientHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(canvas.clientWidth, canvas.clientHeight);
       renderer.setPixelRatio(window.devicePixelRatio);
-      composer.setSize(canvas.clientWidth, canvas.clientHeight);
-      composer.setPixelRatio(window.devicePixelRatio);
     };
     resize();
     window.addEventListener("resize", resize);
@@ -62,6 +54,7 @@
         uSpeed: { value: 0.1 },
         uNoiseFreq: { value: 2.0 },
         uMouse: { value: new THREE.Vector2(0, 0) },
+        uExposure: { value: renderer.toneMappingExposure },
       },
       vertexShader,
       fragmentShader,
@@ -97,22 +90,19 @@
     // Postprocessing
     // ----------------------
 
-    const renderPass = new RenderPass(scene, camera);
-    const outputPass = new OutputPass();
-
-    composer.addPass(renderPass);
-    composer.addPass(outputPass);
-
     function animate() {
       backgroundMaterial.uniforms.uTime.value = performance.now() * 0.0003;
       // Update mouse position in shader
       backgroundMaterial.uniforms.uMouse.value.set(mouse.x, mouse.y);
+      // Update exposure
+      backgroundMaterial.uniforms.uExposure.value =
+        renderer.toneMappingExposure;
 
       // Smooth interpolation of cursor position
       mouse.x += (mouse.targetX - mouse.x) * 0.1;
       mouse.y += (mouse.targetY - mouse.y) * 0.1;
 
-      composer.render();
+      renderer.render(scene, camera);
     }
   }
 </script>

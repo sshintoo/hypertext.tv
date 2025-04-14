@@ -1,6 +1,7 @@
 varying vec2 vUv;
 varying float vDistortion;
 uniform float uTime;
+uniform float uExposure;
 
 // Simple signed random function from LYGIA
 float srandom(vec3 p) {
@@ -12,9 +13,9 @@ void main() {
     
     // Define colors - two RGB rings in black
     vec3 black = vec3(0.0, 0.0, 0.0);
-    vec3 red = vec3(0.2, 0.0, 0.0);
-    vec3 green = vec3(0.0, 0.2, 0.0);
-    vec3 blue = vec3(0.0, 0.0, 0.2);
+    vec3 red = vec3(0.15, 0.0, 0.0);
+    vec3 green = vec3(0.0, 0.15, 0.0);
+    vec3 blue = vec3(0.0, 0.0, 0.15);
     
     // Create multi-stop gradient with concentrated RGB rings
     vec3 baseColor;
@@ -77,6 +78,9 @@ void main() {
     vec3 noiseColor = vec3(noise);
     finalColor = 1.0 - (1.0 - finalColor) * (1.0 - noiseColor);
     finalColor = pow(finalColor, vec3(1.4));
+    
+    // Apply exposure
+    finalColor *= uExposure;
     
     gl_FragColor = vec4(finalColor, 1.0);
 } 

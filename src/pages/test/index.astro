@@ -1,6 +1,7 @@
 ---
 export const prerender = true;
 
+import Rainbow from "@components/Rainbow.astro";
 import Television from "@components/Television.astro";
 import Layout from "@layouts/Layout.astro";
 ---
@@ -17,7 +18,7 @@ import Layout from "@layouts/Layout.astro";
   >
     <div class="test-form">
       <form id="url-form">
-        <p>Test if your site can be viewed on Hypertext TV.</p>
+        <p>Preview your site on Hypertext TV.</p>
         <input
           aria-label="URL"
           type="url"
@@ -28,6 +29,7 @@ import Layout from "@layouts/Layout.astro";
         <button type="submit">Test Site Preview</button>
       </form>
     </div>
+    <Rainbow />
   </Television>
 </Layout>
 
@@ -64,6 +66,9 @@ import Layout from "@layouts/Layout.astro";
     gap: 1rem;
     font-size: clamp(16px, 10vw, 24px);
     font-family: "Arial", sans-serif;
+    position: absolute;
+    inset: 0;
+    z-index: 4;
   }
 
   form {
@@ -77,6 +82,7 @@ import Layout from "@layouts/Layout.astro";
   p {
     text-wrap: pretty;
     text-align: center;
+    font-size: 1.1em;
     line-height: 1.2;
     margin-bottom: 1rem;
   }
@@ -99,14 +105,15 @@ import Layout from "@layouts/Layout.astro";
 
   button {
     padding: 0.5rem 1rem;
-    background-color: #111111;
+    background-color: rgba(255, 255, 255, 0.1);
     color: white;
     border: none;
     border-radius: 40px;
     cursor: pointer;
+    transition: background-color 0.2s ease;
   }
 
   button:hover {
-    background-color: #222222;
+    background-color: rgba(255, 255, 255, 0.2);
   }
 </style>
