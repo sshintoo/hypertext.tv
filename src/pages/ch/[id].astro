@@ -1,12 +1,11 @@
 ---
-export const prerender = false;
-
 import { getEntry } from "astro:content";
 import IFrame from "@components/IFrame.astro";
 import NoSchedule from "@components/NoSchedule.astro";
 import Television from "@components/Television.astro";
 import Layout from "@layouts/Layout.astro";
-import { findActiveProgram } from "@utils/findActiveProgram";
+import type { ActiveProgram } from "@types";
+import { GET } from "../api/program.json";
 
 const { id } = Astro.params;
 if (!id) return Astro.redirect("/404");
@@ -16,7 +15,8 @@ if (!channel) return Astro.redirect("/404");
 
 const { name } = channel.data;
 
-const activeProgram = findActiveProgram(channel.data.schedule, new Date());
+const response = await GET(Astro);
+const activeProgram: ActiveProgram = await response.json();
 ---
 
 <Layout>
@@ -30,4 +30,3 @@ const activeProgram = findActiveProgram(channel.data.schedule, new Date());
     }
   </Television>
 </Layout>
-

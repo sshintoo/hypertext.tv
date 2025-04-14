@@ -1,6 +1,7 @@
 import { getCollection } from "astro:content";
+import type { APIRoute } from "astro";
 
-export async function getAllContributors() {
+export async function listAllContributors() {
   const allChannels = await getCollection("channels");
   const allContributors = allChannels.flatMap((channel) =>
     Object.values(channel.data.schedule).flatMap(
@@ -17,4 +18,22 @@ export async function getAllContributors() {
 
   // Remove duplicates and sort
   return [...new Set(allContributors)].sort();
+}
+
+export const GET: APIRoute = async () => {
+  const contributors = await listAllContributors();
+
+  if (!contributors) {
+    return new Response(null, {
+      status: 404,
+      statusText: "No contributors found",
+    });
+  }
+  
+  return new Response(JSON.stringify(contributors), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 }

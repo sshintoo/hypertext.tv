@@ -1,13 +1,15 @@
 ---
-import { getAllContributors } from "@utils/getAllContributors";
+interface Props {
+  contributors: string[];
+}
 
-const allContributors = await getAllContributors();
+const { contributors } = Astro.props;
 ---
 
 <section>
   <h2>Featuring</h2>
   <div class="featuring">
-    {allContributors.map((contributor) => <span>{contributor}</span>)}
+    {contributors.map((contributor) => <span>{contributor}</span>)}
     <a
       href="https://github.com/evadecker/hypertext.tv"
       target="_blank"

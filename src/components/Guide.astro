@@ -1,124 +1,15 @@
 ---
-export const prerender = false;
-
-import { getCollection, getEntry } from "astro:content";
-import { findActiveProgram } from "@utils/findActiveProgram";
+import type { GuideData } from "@types";
 import RotatingLogo from "./RotatingLogo.astro";
 
-const channels = await getCollection("channels");
-const sortedChannels = channels.sort((a, b) =>
-  a.data.slug.localeCompare(b.data.slug),
-);
+interface Props {
+  guideData: GuideData;
+}
+
+const { guideData } = Astro.props;
+const { timeBlocks, channels } = guideData;
 
 const currentTime = new Date();
-const currentHour = currentTime.getHours();
-const currentMinute = currentTime.getMinutes();
-const nextHour = currentHour + 1;
-
-let timeBlocks = [];
-const createTimeBlock = (hour: number, minute: number) => {
-  const date = new Date();
-  date.setHours(hour, minute, 0); // Set hours, minutes, and 0 seconds
-  return date;
-};
-
-if (currentMinute >= 55) {
-  // If between H:55 and H:60, show the next 30 min block
-  timeBlocks = [
-    createTimeBlock(nextHour, 0),
-    createTimeBlock(nextHour, 30),
-    createTimeBlock(nextHour + 1, 0),
-  ];
-} else if (currentMinute >= 30 && currentMinute < 55) {
-  // If between H:30 and H:55, show the current 30 min block
-  timeBlocks = [
-    createTimeBlock(currentHour, 30),
-    createTimeBlock(nextHour, 0),
-    createTimeBlock(nextHour, 30),
-  ];
-} else if (currentMinute >= 25 && currentMinute < 30) {
-  // If between H:25 and H:30, show the next 30 min block
-  timeBlocks = [
-    createTimeBlock(currentHour, 30),
-    createTimeBlock(nextHour, 0),
-    createTimeBlock(nextHour, 30),
-  ];
-} else {
-  // If between H:00 and H:25, show the current 30 min block
-  timeBlocks = [
-    createTimeBlock(currentHour, 0),
-    createTimeBlock(currentHour, 30),
-    createTimeBlock(nextHour, 0),
-  ];
-}
-
-async function getTimeBlocksForChannel(blocks: Date[], channelId: string) {
-  const channel = await getEntry("channels", channelId);
-  if (!channel)
-    return blocks.map(() => ({
-      title: "",
-      span: 1,
-      continuesBefore: false,
-      continuesAfter: false,
-    }));
-
-  // Create the before/after blocks for checking continuity
-  const blockBefore = new Date(blocks[0].getTime() - 30 * 60000);
-  const blockAfter = new Date(blocks[blocks.length - 1].getTime() + 30 * 60000);
-
-  // Get programs for visible blocks
-  const programs = await Promise.all(
-    blocks.map((block) => {
-      const program = findActiveProgram(channel.data.schedule, block);
-      return program?.program?.title ?? "";
-    }),
-  );
-
-  // Get programs for before/after blocks
-  const programBefore = findActiveProgram(channel.data.schedule, blockBefore);
-  const programAfter = findActiveProgram(channel.data.schedule, blockAfter);
-
-  return programs.reduce(
-    (
-      acc: Array<{
-        title: string;
-        span: number;
-        continuesBefore: boolean;
-        continuesAfter: boolean;
-      }>,
-      title: string,
-      index: number,
-    ) => {
-      if (index === 0 || title !== programs[index - 1]) {
-        const nextDifferentIndex = programs
-          .slice(index)
-          .findIndex((t: string) => t !== title);
-        const span =
-          nextDifferentIndex === -1
-            ? programs.length - index
-            : nextDifferentIndex;
-
-        // Check if program continues before/after visible blocks
-        const isFirstBlock = index === 0;
-        const isLastBlock = index + span === blocks.length;
-
-        const programStartsBefore =
-          isFirstBlock && programBefore?.program?.title === title;
-        const programContinuesAfter =
-          isLastBlock && programAfter?.program?.title === title;
-
-        acc.push({
-          title,
-          span,
-          continuesBefore: programStartsBefore,
-          continuesAfter: programContinuesAfter,
-        });
-      }
-      return acc;
-    },
-    [],
-  );
-}
 ---
 
 <main class="guide">
@@ -142,10 +33,10 @@ async function getTimeBlocksForChannel(blocks: Date[], channelId: string) {
               </time>
             </th>
             {
-              timeBlocks.map((block) => (
+              timeBlocks.map((block: string) => (
                 <th class="time-block">
-                  <time datetime={block.toISOString()}>
-                    {block.toLocaleTimeString([], {
+                  <time datetime={block}>
+                    {new Date(block).toLocaleTimeString([], {
                       hour: "numeric",
                       minute: "2-digit",
                     })}
@@ -157,29 +48,31 @@ async function getTimeBlocksForChannel(blocks: Date[], channelId: string) {
         </thead>
         <tbody>
           {
-            sortedChannels.map(({ data: { slug, name } }) => (
+            channels.map(({ channel, blocks }) => (
               <tr>
                 <th>
-                  <a class="channel-info" href={`/ch/${slug}`}>
-                    <span class="channel-number">{slug}</span>
-                    <span class="channel-name">{name}</span>
+                  <a class="channel-info" href={`/ch/${channel.slug}`}>
+                    <span class="channel-number">{channel.slug}</span>
+                    <span class="channel-name">{channel.name}</span>
                   </a>
                 </th>
-                {getTimeBlocksForChannel(timeBlocks, slug).then((blocks) =>
-                  blocks.map(
-                    ({ title, span, continuesBefore, continuesAfter }) => (
-                      <td colspan={span}>
-                        <div class="program-info" data-empty={!title}>
-                          <div
-                            class="program-contents"
-                            data-continues-before={continuesBefore}
-                            data-continues-after={continuesAfter}
-                          >
-                            {title}
-                          </div>
-                        </div>
-                      </td>
-                    ),
+                {blocks.map(
+                  ({ title, span, continuesBefore, continuesAfter }) => (
+                    <td colspan={span}>
+                      <a
+                        href={`/ch/${channel.slug}`}
+                        class="program-info"
+                        data-empty={!title}
+                      >
+                        <span
+                          class="program-contents"
+                          data-continues-before={continuesBefore}
+                          data-continues-after={continuesAfter}
+                        >
+                          {title}
+                        </span>
+                      </a>
+                    </td>
                   ),
                 )}
               </tr>
@@ -383,6 +276,8 @@ async function getTimeBlocksForChannel(blocks: Date[], channelId: string) {
   }
 
   .program-info {
+    display: block;
+    text-decoration: none;
     background: linear-gradient(to top, rgb(0, 0, 197), rgb(0, 0, 128));
     color: #eeeeee;
     text-shadow: 0 2px 1px rgba(0, 0, 0, 0.5);

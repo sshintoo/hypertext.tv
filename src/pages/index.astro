@@ -2,13 +2,18 @@
 import Guide from "@components/Guide.astro";
 import Television from "@components/Television.astro";
 import Layout from "@layouts/Layout.astro";
-import type { ActiveProgram } from "@types";
+import type { ActiveProgram, GuideData } from "@types";
+import { GET } from "./api/guide.json";
 
 const channelId = "00";
 const channelName = "TV Guide";
 const activeProgram: ActiveProgram = {
   program: { title: "What's Airing Now" },
 };
+
+// Fetch guide data from the API
+const response = await GET(Astro);
+const guideData: GuideData = await response.json();
 ---
 
 <Layout>
@@ -17,6 +22,6 @@ const activeProgram: ActiveProgram = {
     channelId={channelId}
     channelName={channelName}
   >
-    <Guide />
+    <Guide guideData={guideData} />
   </Television>
 </Layout>

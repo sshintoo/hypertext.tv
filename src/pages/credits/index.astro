@@ -1,11 +1,15 @@
 ---
 import Television from "src/components/Television.astro";
 import Layout from "src/layouts/Layout.astro";
+import { GET } from "../api/contributors.json";
 import Featuring from "./_sections/Featuring.astro";
 import Fonts from "./_sections/Fonts.astro";
 import Intro from "./_sections/Intro.astro";
 import Rainbow from "./_sections/Rainbow.astro";
 import Thanks from "./_sections/Thanks.astro";
+
+const response = await GET(Astro);
+const contributors: string[] = await response.json();
 ---
 
 <Layout>
@@ -19,7 +23,7 @@ import Thanks from "./_sections/Thanks.astro";
     <div id="credits">
       <div class="credits-content">
         <Intro />
-        <Featuring />
+        <Featuring contributors={contributors} />
         <Fonts />
         <Thanks />
       </div>
