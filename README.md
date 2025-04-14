@@ -1,4 +1,4 @@
-![public/assets/preview.png](Hypertext TV Logo)
+![Hypertext TV Logo](public/assets/preview.png)
 
 # Hypertext TV
 
