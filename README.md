@@ -24,8 +24,4 @@ This site aims to conform to the Level AA accessibility standards outlined in th
 
 ## Credit
 
-Hypertext TV was created by [Eva Decker](https://eva.town)) at the [School for Poetic Computation](https://sfpc.study/) during the 2025 class _The Browser is Already a Game Engine_ with [Everest Pipkin](https://everest-pipkin.com/). [View the full site credits.](https://hypertext.tv/credits)
-
-## License
-
-MIT
+Hypertext TV was created by [Eva Decker](https://eva.town) at the [School for Poetic Computation](https://sfpc.study/) during the 2025 class _The Browser is Already a Game Engine_ with [Everest Pipkin](https://everest-pipkin.com/). [View full site credits.](https://hypertext.tv/credits)
