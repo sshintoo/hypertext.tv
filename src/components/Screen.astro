@@ -157,18 +157,6 @@ const { channelId, channelName }: Props = Astro.props;
     overflow: hidden;
     will-change: transform;
 
-    &::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-image: url("/assets/crt.png");
-      background-size: 100% 100%;
-      background-repeat: no-repeat;
-      background-position: center;
-      z-index: 5;
-      pointer-events: none;
-    }
-
     &[data-booting="true"] {
       animation: power-on 6s 10ms ease-out both;
     }
@@ -180,6 +168,39 @@ const { channelId, channelName }: Props = Astro.props;
     &[data-power="off"] {
       opacity: 0;
       pointer-events: none;
+    }
+
+    /* CRT screen edges */
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      background:
+        /* Top and bottom */
+        radial-gradient(
+          ellipse 250% 50%,
+          rgba(0, 0, 0, 0) 0%,
+          rgba(0, 0, 0, 0) 95%,
+          rgba(0, 0, 0, 0.1) 96%,
+          rgba(0, 0, 0, 1) 99%
+        ),
+        /* Left and right */
+          radial-gradient(
+            ellipse 50% 250%,
+            rgba(0, 0, 0, 0) 0%,
+            rgba(0, 0, 0, 0) 95%,
+            rgba(0, 0, 0, 0.1) 96%,
+            rgba(0, 0, 0, 1) 99%
+          ),
+        /* Corners */
+          radial-gradient(
+            farthest-corner,
+            rgba(0, 0, 0, 0) 93%,
+            rgba(0, 0, 0, 0.1) 94%,
+            rgba(0, 0, 0, 0.9) 96%
+          );
     }
   }
 

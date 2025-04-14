@@ -28,7 +28,7 @@ export function infiniteScrollLoop(
 
   const threshold = Math.floor(container.clientHeight * 0.1);
 
-  container.addEventListener("scroll", () => {
+  const handleScroll = () => {
     const contentHeight = content.clientHeight;
 
     if (container.scrollTop > contentHeight + threshold) {
@@ -36,7 +36,9 @@ export function infiniteScrollLoop(
     } else if (container.scrollTop < threshold) {
       container.scrollTo(0, contentHeight + container.scrollTop);
     }
-  });
+  };
+
+  container.addEventListener("scroll", handleScroll, { passive: true });
 
   if (scrollSpeed) {
     let lastTime = performance.now();
@@ -52,8 +54,8 @@ export function infiniteScrollLoop(
       lastTime = performance.now(); // Reset time to prevent jump
     };
 
-    container.addEventListener("touchstart", handleTouchStart);
-    container.addEventListener("touchend", handleTouchEnd);
+    container.addEventListener("touchstart", handleTouchStart, { passive: true });
+    container.addEventListener("touchend", handleTouchEnd, { passive: true });
 
     function animate(currentTime: number) {
       if (!scrollSpeed) return;
