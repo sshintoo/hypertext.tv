@@ -65,9 +65,6 @@ const { src }: Props = Astro.props;
 
   if (iframe) {
     iframe.addEventListener("load", () => {
-      // Display white background (for sites with undefined backgrounds)
-      iframe.classList.add("loaded");
-
       // Remove background static
       canvas.remove();
     });
@@ -80,10 +77,7 @@ const { src }: Props = Astro.props;
     height: 100%;
     display: block;
     border: none;
-
-    &.loaded {
-      background-color: white;
-    }
+    background: #000000;
   }
 
   #static {
