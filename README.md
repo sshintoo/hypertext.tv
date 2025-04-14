@@ -1,3 +1,5 @@
+![public/assets/preview.png](Hypertext TV Logo)
+
 # Hypertext TV
 
 ## What's this?
