@@ -19,7 +19,7 @@ We'll air [handmade websites](https://luckysoap.com/statements/handmadeweb.html)
 
 Create a pull request against this repository by [forking it](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project) or by editing the file from the GitHub interface.
 
-1. Go to [src/channels]([https://github.](https://github.com/evadecker/hypertext.tv/tree/main/src/channels)).
+1. Go to [src/channels](https://github.com/evadecker/hypertext.tv/tree/main/src/channels).
 2. This folder contains `.yml` files which define the airing schedule for each channel: games, art, music, personal, poetry, single-use, explorables, archives, and misc. Select a channel for your site and open its `.yml` file.
 3. Find a day and time within `schedule` for your website to air.
 4. Add your site details. For example:
@@ -45,7 +45,7 @@ Create a pull request against this repository by [forking it](https://docs.githu
 To preview your site, visit [hypertext.tv/test](https://hypertext.tv/test) and enter your site URL.
 
 > [!NOTE]
-> Hypertext TV displays sites using [iframe](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/iframe). If your domain explicitly blocks [cross-origin resource sharing](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS), we won't be able to display your site on the TV. To fix this, you need to modify or remove the HTTP [X-Frame-Options](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/> Headers/X-Frame-Options) response header on your server.
+> Hypertext TV displays sites using [iframe](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/iframe). If your domain explicitly blocks [cross-origin resource sharing](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CORS), we won't be able to display your site on the TV. To fix this, you need to modify or remove the HTTP [X-Frame-Options](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/X-Frame-Options) response header on your server.
 
 ## What time block should I pick?
 
@@ -55,4 +55,4 @@ Programs can only be scheduled at `:00` or `:30`. Programs will air continuously
 
 ## Can I submit more than one site?
 
-If you have multiple sites that meet the criteria, sure!
+If you have multiple sites that meet the criteria, please do!
