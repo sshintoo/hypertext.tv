@@ -54,7 +54,9 @@ export function infiniteScrollLoop(
       lastTime = performance.now(); // Reset time to prevent jump
     };
 
-    container.addEventListener("touchstart", handleTouchStart, { passive: true });
+    container.addEventListener("touchstart", handleTouchStart, {
+      passive: true,
+    });
     container.addEventListener("touchend", handleTouchEnd, { passive: true });
 
     function animate(currentTime: number) {
