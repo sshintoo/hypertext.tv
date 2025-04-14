@@ -29,11 +29,11 @@ export const GET: APIRoute = async () => {
       statusText: "No contributors found",
     });
   }
-  
+
   return new Response(JSON.stringify(contributors), {
     status: 200,
     headers: {
       "Content-Type": "application/json",
     },
   });
-}
+};

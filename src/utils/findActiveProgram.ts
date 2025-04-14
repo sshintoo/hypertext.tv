@@ -55,7 +55,7 @@ export function findActiveProgram(
   if (currentSlot) {
     // Find the next defined slot to determine end time
     const nextSlot = definedSlots.find(
-      (slot) => currentSlot && Object.keys(slot)[0] > currentSlot.startTime
+      (slot) => currentSlot && Object.keys(slot)[0] > currentSlot.startTime,
     );
 
     const endTime = nextSlot ? Object.keys(nextSlot)[0] : "24:00";

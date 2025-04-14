@@ -14,7 +14,7 @@ function createTimeBlocks(datetime: Date) {
   };
 
   let timeBlocks = [];
-  
+
   if (currentMinute >= 55) {
     // If between H:55 and H:60, show the next 30 min block
     timeBlocks = [
@@ -139,18 +139,21 @@ export const GET: APIRoute = async ({ params }) => {
         },
         blocks,
       };
-    })
+    }),
   );
 
   // Return the guide data
-  return new Response(JSON.stringify({
-    currentTime: datetime.toISOString(),
-    timeBlocks: timeBlocks.map(block => block.toISOString()),
-    channels: guideData,
-  }), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json",
+  return new Response(
+    JSON.stringify({
+      currentTime: datetime.toISOString(),
+      timeBlocks: timeBlocks.map((block) => block.toISOString()),
+      channels: guideData,
+    }),
+    {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+      },
     },
-  });
-} 
+  );
+};

@@ -18,20 +18,20 @@ export type ProgramBlock = {
   span: number;
   continuesBefore: boolean;
   continuesAfter: boolean;
-}
+};
 
 export type Channel = {
   slug: string;
   name: string;
-}
+};
 
 export type ChannelData = {
   channel: Channel;
   blocks: ProgramBlock[];
-}
+};
 
 export type GuideData = {
   currentTime: string;
   timeBlocks: string[];
   channels: ChannelData[];
-}
+};

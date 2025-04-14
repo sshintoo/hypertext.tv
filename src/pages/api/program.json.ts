@@ -30,11 +30,11 @@ export const GET: APIRoute = async ({ params }) => {
       statusText: "No program found",
     });
   }
-  
+
   return new Response(JSON.stringify(program), {
     status: 200,
     headers: {
       "Content-Type": "application/json",
     },
   });
-}
+};
