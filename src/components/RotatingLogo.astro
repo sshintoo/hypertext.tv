@@ -13,7 +13,9 @@
   import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
   import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
   import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
-  import { RGBTrailPass } from "../shaders/RGBTrailPass";
+  import { LUTPass } from "three/addons/postprocessing/LUTPass.js";
+  import { LUTCubeLoader } from "three/addons/loaders/LUTCubeLoader.js";
+  import { ColorTrailPass } from "../shaders/ColorTrailPass";
   import { DragControls } from "three/examples/jsm/Addons.js";
 
   const svg = `<svg width="199" height="71" viewBox="0 0 199 71" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -27,7 +29,7 @@
     // Three.js setup
     // ----------------------
 
-    const scene = new THREE.Scene(); // Exponential fog for depth effect
+    const scene = new THREE.Scene();
     scene.fog = new THREE.FogExp2(0x000000, 0.0015);
 
     const camera = new THREE.PerspectiveCamera(
@@ -43,11 +45,11 @@
     const renderer = new THREE.WebGLRenderer({
       powerPreference: "low-power",
       alpha: true,
-      antialias: true,
+      antialias: false,
       preserveDrawingBuffer: true,
     });
     renderer.setAnimationLoop(animate);
-    renderer.toneMapping = THREE.ReinhardToneMapping;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.2;
     canvas.appendChild(renderer.domElement);
 
@@ -60,11 +62,11 @@
     scene.add(starField);
 
     // Star parameters
-    const starCount = 500;
+    const starCount = 400;
     const starSpeed = 12;
     const minStarSize = 0.5;
     const maxStarSize = 2;
-    const starDepth = 2400; // How far the stars travel
+    const starDepth = 2000; // How far the stars travel
     const centerAvoidanceRadius = 100; // Radius around center to avoid stars
 
     // Create star material
@@ -82,9 +84,15 @@
       const randomSize =
         minStarSize + Math.random() * (maxStarSize - minStarSize);
 
-      // Create a small sphere for each star
-      const geometry = new THREE.SphereGeometry(randomSize, 8, 8);
+      // Use a cylinder for each star, with random diameter and fixed height
+      const geometry = new THREE.CylinderGeometry(
+        randomSize,
+        randomSize,
+        16,
+        8,
+      );
       const star = new THREE.Mesh(geometry, starMaterial);
+      star.rotation.x = Math.PI / 2; // Orient cylinder horizontally (along Z)
 
       // Random position within a wide area, avoiding center
       let x, y, z;
@@ -101,8 +109,8 @@
       } while (distanceFromCenter < centerAvoidanceRadius);
 
       star.position.set(x, y, z);
-      starField.add(star);
       stars.push(star);
+      starField.add(star);
     }
 
     const composer = new EffectComposer(renderer);
@@ -132,12 +140,12 @@
     svgGroup.scale.y *= -1;
 
     const material = new THREE.MeshPhysicalMaterial({
-      color: "white",
+      color: "gold",
       emissive: "white",
       emissiveIntensity: 2,
       reflectivity: 1,
       metalness: 1,
-      roughness: 0.15,
+      roughness: 0.13,
     });
 
     // Loop through all of the parsed paths
@@ -207,6 +215,21 @@
     scene.add(bottomDirectionalLight);
 
     // ----------------------
+    // Color Grading
+    // ----------------------
+
+    const lutPass = new LUTPass({
+      lut: undefined,
+      intensity: 0.4,
+    });
+
+    const lutLoader = new LUTCubeLoader();
+    lutLoader.load("/luts/vintage.cube", (result) => {
+      lutPass.lut = result.texture3D;
+      lutPass.enabled = true;
+    });
+
+    // ----------------------
     // Postprocessing
     // ----------------------
 
@@ -217,12 +240,14 @@
       0.0001,
       0.99,
     );
-    const rgbTrailPass = new RGBTrailPass();
+
+    const colorTrailPass = new ColorTrailPass();
     const outputPass = new OutputPass();
 
     composer.addPass(renderPass);
-    composer.addPass(rgbTrailPass);
+    composer.addPass(colorTrailPass);
     composer.addPass(bloomPass);
+    composer.addPass(lutPass);
     composer.addPass(outputPass);
 
     // ----------------------
@@ -233,7 +258,7 @@
     const MAX_ROTATION_SPEED = 0.2; // Speed when facing back
 
     const MIN_LIGHT_INTENSITY = 0;
-    const MAX_LIGHT_INTENSITY = 1;
+    const MAX_LIGHT_INTENSITY = 1.2;
     const LIGHT_DROPOFF = 6; // Speed of light dropoff between max and min, higher is faster
 
     // Begin animation rotated off center
@@ -263,7 +288,7 @@
         star.position.z += starSpeed;
 
         // Reset stars that have passed the camera
-        if (star.position.z > 400) {
+        if (star.position.z > 300) {
           // Reset position, avoiding center
           let newX, newY;
           let distanceFromCenter;
@@ -309,8 +334,8 @@
     width: 100%;
     height: 100%;
     background: radial-gradient(
-      ellipse 80% 300% at 50% 120%,
-      blue,
+      ellipse at 50% 100%,
+      rgb(68, 48, 94),
       black,
       black
     );
