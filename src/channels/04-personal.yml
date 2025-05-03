@@ -96,6 +96,9 @@ schedule:
     - "10:30":
     - "11:00":
     - "11:30":
+        title: Kit Mills
+        author: Kit Mills
+        url: https://mitkills.com/
     - "12:00":
     - "12:30":
     - "13:00":
@@ -173,6 +176,9 @@ schedule:
     - "15:30":
     - "16:00":
     - "16:30":
+        title: Henry Heffernan
+        author: Henry Heffernan
+        url: https://henryheffernan.com/
     - "17:00":
     - "17:30":
     - "18:00":
